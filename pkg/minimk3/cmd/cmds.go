@@ -1,13 +1,14 @@
-package minimk3
+package cmd
 
 import (
 	"bytes"
 	"gitlab.com/gomidi/midi/midimessage/sysex"
+	"log"
 )
 
-//go:generate go-enum -f=$GOFILE
+//go:generate go-enum -f=$GOFILE --noprefix
 
-// Layout x ENUM(
+// Cmd x ENUM(
 /*
   DeviceInquiry
 	EnableSession
@@ -26,20 +27,20 @@ type Cmd int
 var CommandHeader = []byte{0x00, 0x20, 0x29, 0x02, 0x0D}
 
 var cmdByte = map[Cmd]byte{
-	CmdEnableSession:   0x10,
-	CmdSelectLayout:    0x00,
-	CmdProgrammerMode:  0x0e,
-	CmdBrightnessLevel: 0x08,
-	CmdClearDawState:   0x12,
-	CmdSessionColor:    0x14,
-	CmdTextScrolling:   0x07,
-	CmdLedColor:        0x03,
-	CmdSleep:           0x09,
+	EnableSession:   0x10,
+	SelectLayout:    0x00,
+	ProgrammerMode:  0x0e,
+	BrightnessLevel: 0x08,
+	ClearDawState:   0x12,
+	SessionColor:    0x14,
+	TextScrolling:   0x07,
+	LedColor:        0x03,
+	Sleep:           0x09,
 }
 
 func (c Cmd) Bytes() []byte {
 	switch c {
-	case CmdDeviceInquiry:
+	case DeviceInquiry:
 		return []byte{0x7E, 0x7F, 0x06, 0x01}
 	default:
 		if byt, ok := cmdByte[c]; ok {

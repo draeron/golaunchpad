@@ -3,13 +3,16 @@ package main
 import (
 	"fmt"
 	"github.com/draeron/golaunchpad/pkg/device"
-	"github.com/draeron/golaunchpad/pkg/device/event"
+	devevt "github.com/draeron/golaunchpad/pkg/device/event"
 	"github.com/draeron/golaunchpad/pkg/minimk3"
+	"github.com/draeron/golaunchpad/pkg/minimk3/button"
+	"github.com/draeron/golaunchpad/pkg/minimk3/event"
 	"github.com/draeron/gopkg/color"
 	"github.com/draeron/gopkg/logger"
 	"math/rand"
 	"os"
 	"os/signal"
+	"time"
 )
 
 var log = logger.New("main")
@@ -20,7 +23,7 @@ func main() {
 	defer log.Info("exiting golaunchpad")
 
 	minimk3.SetLogger(logger.New("minimk3"))
-	event.SetLogger(logger.New("event"))
+	devevt.SetLogger(logger.New("event"))
 	device.SetLogger(logger.New("device"))
 
 	var err error
@@ -37,33 +40,52 @@ func main() {
 
 func setup() {
 	must(pad.ClearColors(color.Black))
-
-	btns := []minimk3.BtnColor{}
-	for i := minimk3.BtnRow1; i <= minimk3.BtnStopSoloMute; i++ {
-		btns = append(btns, minimk3.BtnColor{i, color.Palette[i-minimk3.BtnRow1]})
-	}
-	must(pad.SetBtnColors(btns))
-
-	must(pad.SetBtnColor(minimk3.BtnLogo, color.LightGray))
+	must(pad.SetBtnColor(button.Logo, color.LightGray))
 
 	go func() {
-		ch := make(chan minimk3.Event, 4)
+		ch := make(chan event.Event, 10)
 		pad.Subscribe(ch)
 		for e := range ch {
 			if e.Btn.IsPad() {
-				if e.Type == minimk3.EventTypePressed {
-					col := color.Palette[rand.Intn(len(color.Palette)-1)]
+				if e.Type == event.Pressed {
+					col := randColor()
 					err := pad.SetBtnColor(e.Btn, col)
 					log.LogIfErr(err)
-				} else if e.Type == minimk3.EventTypeReleased {
+					go wavefx(e.Btn, col)
+				} else if e.Type == event.Released {
 					err := pad.SetBtnColor(e.Btn, color.Black)
 					log.LogIfErr(err)
-					//time.AfterFunc(time.Millisecond * 100, func() {
-					//})
 				}
 			}
 		}
 	}()
+}
+
+func wavefx(btn button.Button, col color.Color) {
+	x,y := btn.Coord()
+	for radius := 1; radius < 8; radius++ {
+		btns := []minimk3.BtnColor{
+			{button.FromXY(x+radius, y), col},
+			{button.FromXY(x, y+radius), col},
+			{button.FromXY(x-radius, y), col},
+			{button.FromXY(x, y-radius), col},
+		}
+		pad.SetBtnColors(btns)
+		<- time.After(time.Millisecond * 50)
+		btns[0].Color = color.Black
+		btns[1].Color = color.Black
+		btns[2].Color = color.Black
+		btns[3].Color = color.Black
+		pad.SetBtnColors(btns)
+	}
+}
+
+func randColor() color.Color {
+	col := color.Black.RGB()
+	for col == color.Black.RGB() {
+		col = color.Palette[rand.Intn(len(color.Palette)-1)]
+	}
+	return col
 }
 
 func waitExit() {

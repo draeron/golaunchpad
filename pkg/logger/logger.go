@@ -1,5 +1,10 @@
 package logger
 
+import (
+	"fmt"
+	"os"
+)
+
 /*
   This match the signature of go.uber.org/zap sugarred logger
 */
@@ -28,10 +33,13 @@ func (d Dummy) Errorf(template string, args ...interface{}) {
 }
 
 func (d Dummy) DPanicf(template string, args ...interface{}) {
+	panic(fmt.Sprintf(template, args))
 }
 
 func (d Dummy) Panicf(template string, args ...interface{}) {
+	panic(fmt.Sprintf(template, args))
 }
 
 func (d Dummy) Fatalf(template string, args ...interface{}) {
+	os.Exit(1)
 }

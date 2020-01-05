@@ -1,48 +1,16 @@
 package minimk3
 
 import (
-	"fmt"
-	"github.com/draeron/golaunchpad/pkg/device/event"
+	dev "github.com/draeron/golaunchpad/pkg/device/event"
+	mk3 "github.com/draeron/golaunchpad/pkg/minimk3/event"
 )
 
-type Event struct {
-	Type EventType
-	Btn  Btn
-}
-
-func (e Event) String() string {
-	return fmt.Sprintf("Event: %s - %s", e.Type, e.Btn)
-}
-
-func toEvent(evt event.Event) Event {
-	e := Event{}
-
-	switch evt.Type {
-	case event.NoteOn, event.NoteOff:
-		e.Btn = btnFromId(evt.Value)
-		if evt.Type == event.NoteOn {
-			e.Type = EventTypePressed
-		} else if evt.Type == event.NoteOff {
-			e.Type = EventTypeReleased
-		}
-	case event.ControlChange:
-		e.Btn = btnFromId(evt.Controller)
-		if evt.Value == 127 {
-			e.Type = EventTypePressed
-		} else {
-			e.Type = EventTypeReleased
-		}
-	}
-
-	return e
-}
-
-func (m *Controller) Subscribe(channel chan<- Event) {
+func (m *Controller) Subscribe(channel chan<- mk3.Event) {
 	m.subscribers = append(m.subscribers, channel)
 }
 
-func (m *Controller) onDeviceEvent(in event.Event) {
-	evt := toEvent(in)
+func (m *Controller) onDeviceEvent(in dev.Event) {
+	evt := mk3.FromMidiEvent(in)
 	for _, c := range m.subscribers {
 		c <- evt
 	}

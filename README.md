@@ -24,7 +24,8 @@
 
 ## Examples
 
-- [wave](examples/wave): colored wave upon pressing a pad button
+- [wave](examples/wave/wave.go): colored wave upon pressing a pad button
+- [scan](examples/scan/scan.go): light up every button one after the other
 
 ## Ref
 

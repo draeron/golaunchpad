@@ -1,12 +1,14 @@
 package minimk3
 
 import (
+	"github.com/draeron/golaunchpad/pkg/minimk3/button"
+	"github.com/draeron/golaunchpad/pkg/minimk3/cmd"
 	"go.uber.org/zap/buffer"
 	"image/color"
 )
 
 type BtnColor struct {
-	Btn   Btn
+	Btn   button.Button
 	Color color.Color
 }
 
@@ -14,15 +16,15 @@ const (
 	RgbColorInstruction = 3
 )
 
-func (m *Controller) SetBtnColor(btn Btn, color color.Color) error {
+func (m *Controller) SetBtnColor(btn button.Button, color color.Color) error {
 	id := btn.Id()
 	r, g, b, _ := color.RGBA()
-	msg := CmdLedColor.SysEx(3, id, byte(r>>9), byte(g>>9), byte(b>>9))
+	msg := cmd.LedColor.SysEx(3, id, byte(r>>9), byte(g>>9), byte(b>>9))
 	return m.device.SendDaw(msg)
 }
 
 func (m *Controller) ClearColors(col color.Color) error {
-	btns := BtnValues()
+	btns := button.Values()
 	bcs := []BtnColor{}
 	for _, btn := range btns {
 		bcs = append(bcs, BtnColor{btn, col})
@@ -33,6 +35,10 @@ func (m *Controller) ClearColors(col color.Color) error {
 func (m *Controller) SetBtnColors(sets []BtnColor) error {
 	buf := buffer.Buffer{}
 	for idx, bc := range sets {
+		if !bc.Btn.IsValid() {
+			continue
+		}
+
 		// the launchpad accept up to a maximum of 81 color spec per message
 		if idx > 81 {
 			log.Warnf("sending too many colors (%d) in a single message", len(sets))
@@ -43,6 +49,6 @@ func (m *Controller) SetBtnColors(sets []BtnColor) error {
 			return err
 		}
 	}
-	msg := CmdLedColor.SysEx(buf.Bytes()...)
+	msg := cmd.LedColor.SysEx(buf.Bytes()...)
 	return m.device.SendMidi(msg)
 }

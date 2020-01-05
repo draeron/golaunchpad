@@ -5,13 +5,7 @@ import (
 	"regexp"
 )
 
-var (
-	DAW_ID      = regexp.MustCompile(`LPMiniMK3 MIDI ([[:digit:]])+$`)
-	MIDI_IN_ID  = regexp.MustCompile(`MIDIIN([0-9]+) \(LPMiniMK3 MIDI\)`)
-	MIDI_OUT_ID = regexp.MustCompile(`MIDIOUT([0-9]+) \(LPMiniMK3 MIDI\)`)
-)
-
-func Detect() (*MiniMk3, error) {
+func Detect(rxDaw, midiInRx, midiOutRx *regexp.Regexp) (*MiniMk3, error) {
 	drv, err := rtmididrv.New()
 	if err != nil {
 		return nil, err
@@ -25,9 +19,9 @@ func Detect() (*MiniMk3, error) {
 	}
 
 	for _, in := range ins {
-		if DAW_ID.MatchString(in.String()) {
+		if rxDaw.MatchString(in.String()) {
 			pad.dawIn = in
-		} else if MIDI_IN_ID.MatchString(in.String()) {
+		} else if midiInRx.MatchString(in.String()) {
 			pad.midiIn = in
 		}
 	}
@@ -38,9 +32,9 @@ func Detect() (*MiniMk3, error) {
 	}
 
 	for _, out := range outs {
-		if DAW_ID.MatchString(out.String()) {
+		if rxDaw.MatchString(out.String()) {
 			pad.dawOut = out
-		} else if MIDI_OUT_ID.MatchString(out.String()) {
+		} else if midiOutRx.MatchString(out.String()) {
 			pad.midiOut = out
 		}
 	}
