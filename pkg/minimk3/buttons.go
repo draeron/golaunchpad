@@ -12,6 +12,7 @@ package minimk3
   Drums
   Keys
   User
+	Logo
   Row1
   Row2
   Row3
@@ -88,41 +89,58 @@ package minimk3
 // )
 type Btn int
 
+var reverseBtnIdLookup = map[byte]Btn{}
+
+func init() {
+	for _, b := range BtnValues() {
+		reverseBtnIdLookup[b.Id()] = b
+	}
+}
+
 func (b Btn) Id() byte {
-  switch {
-  case b >= BtnUp && b <= BtnUser:
-    return byte(91 + b - BtnUp)
-  case b >= BtnRow1 && b <= BtnStopSoloMute:
-    return byte(89 - (b - BtnRow1) * 10)
-  case b >= BtnPad11 && b <= BtnPad88:
-    diff := b - BtnPad11
-    return byte(81 + (diff%8) - (diff/8*10) )
-  }
-  log.Panicf("unknown btn value: %s", b)
-  return 0
+	switch {
+	case b >= BtnUp && b <= BtnLogo:
+		return byte(91 + b - BtnUp)
+	case b >= BtnRow1 && b <= BtnStopSoloMute:
+		return byte(89 - (b-BtnRow1)*10)
+	case b >= BtnPad11 && b <= BtnPad88:
+		diff := b - BtnPad11
+		return byte(81 + (diff % 8) - (diff / 8 * 10))
+	}
+	log.Panicf("unknown btn value: %s", b)
+	return 0
 }
 
 func (b Btn) IsPad() bool {
-  return b >= BtnPad11 && b <= BtnPad88
+	return b >= BtnPad11 && b <= BtnPad88
 }
 
 func (b Btn) IsRow() bool {
-  return b >= BtnRow1 && b <= BtnStopSoloMute
+	return b >= BtnRow1 && b <= BtnStopSoloMute
 }
 
 func (b Btn) IsCol() bool {
-  return b >= BtnUp && b <= BtnUser
+	return b >= BtnUp && b <= BtnUser
 }
 
 func (b Btn) IsArrow() bool {
-  return b >= BtnUp && b <= BtnRight
+	return b >= BtnUp && b <= BtnRight
+}
+
+func btnFromId(id byte) Btn {
+	if btn, ok := reverseBtnIdLookup[id]; ok {
+		return btn
+	} else {
+		log.Panicf("invalid button midi id: %v", id)
+	}
+	return BtnStopSoloMute
 }
 
 func BtnValues() (btns []Btn) {
-  for _, b := range _BtnValue {
-    btns = append(btns, b)
-  }
-  return
+	for _, b := range _BtnValue {
+		btns = append(btns, b)
+	}
+	return
 }
 
 /*
@@ -133,4 +151,4 @@ func Colors() []PaletteColor {
 	}
 	return cols
 }
- */
+*/

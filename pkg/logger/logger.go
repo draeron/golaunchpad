@@ -2,18 +2,18 @@ package logger
 
 /*
   This match the signature of go.uber.org/zap sugarred logger
- */
+*/
 type Logger interface {
-  Debugf(template string, args ...interface{})
-  Infof(template string, args ...interface{})
-  Warnf(template string, args ...interface{})
-  Errorf(template string, args ...interface{})
-  DPanicf(template string, args ...interface{})
-  Panicf(template string, args ...interface{})
-  Fatalf(template string, args ...interface{})
+	Debugf(template string, args ...interface{})
+	Infof(template string, args ...interface{})
+	Warnf(template string, args ...interface{})
+	Errorf(template string, args ...interface{})
+	DPanicf(template string, args ...interface{})
+	Panicf(template string, args ...interface{})
+	Fatalf(template string, args ...interface{})
 }
 
-type Dummy struct {}
+type Dummy struct{}
 
 func (d Dummy) Debugf(template string, args ...interface{}) {
 }

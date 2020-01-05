@@ -1,6 +1,6 @@
 package minimk3
 
-//go:generate go-enum -f=$GOFILE 
+//go:generate go-enum -f=$GOFILE
 
 // Layout x ENUM(
 /*
@@ -14,22 +14,20 @@ package minimk3
 // )
 type Layout int
 
+var layoutByteValue = map[Layout]byte{
+	LayoutSession:    0x00,
+	LayoutDrum:       0x04,
+	LayoutKeys:       0x05,
+	LayoutUser:       0x06,
+	LayoutDawFaders:  0x0d,
+	LayoutProgrammer: 0x07f,
+}
+
 func (l Layout) value() byte {
-  switch l {
-  case LayoutSession:
-    return 0x00
-  case LayoutDrum:
-    return 0x04
-  case LayoutKeys:
-    return 0x05
-  case LayoutUser:
-    return 0x06
-  case LayoutDawFaders:
-    return 0x0d
-  case LayoutProgrammer:
-    return 0x07f
-  default:
-    log.DPanicf("unsupported layout: %s", l.String())
-    return 0
-  }
+	if byt, ok := layoutByteValue[l]; ok {
+		return byt
+	} else {
+		log.Panicf("unsupported layout: %s", l.String())
+	}
+	return 0
 }
