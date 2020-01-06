@@ -129,11 +129,15 @@ func (b Button) IsCol() bool {
 	return b >= Up && b <= User
 }
 
+func (b Button) IsMode() bool {
+	return b >= Session && b <= User
+}
+
 func (b Button) IsArrow() bool {
 	return b >= Up && b <= Right
 }
 
-func (b Button) Coord() (x,y int) {
+func (b Button) Coord() (x, y int) {
 	switch {
 	case b.IsCol():
 		diff := b - Up
@@ -143,14 +147,14 @@ func (b Button) Coord() (x,y int) {
 		return 9, int(1 + diff)
 	case b.IsPad():
 		diff := b - Pad11
-		return int(diff % 8), int(1 + diff / 8)
+		return int(diff % 8), int(1 + diff/8)
 	}
 
 	return 0, 9 // default to logo
 }
 
 func (b Button) IsValid() bool {
-	return b >= 0 && b <= Pad88
+	return b >= Up && b <= Pad88
 }
 
 func Pads() (s []Button) {
@@ -174,6 +178,13 @@ func Columns() (s []Button) {
 	return
 }
 
+func Modes() (s []Button) {
+	for b := Session; b <= User; b++ {
+		s = append(s, b)
+	}
+	return
+}
+
 func Arrows() (s []Button) {
 	for b := Up; b <= Right; b++ {
 		s = append(s, b)
@@ -187,7 +198,7 @@ func FromMidiId(id byte) Button {
 	} else {
 		log.Panicf("invalid button midi id: %v", id)
 	}
-	return StopSoloMute
+	return Logo
 }
 
 func Values() (s Buttons) {
@@ -198,7 +209,7 @@ func Values() (s Buttons) {
 	return
 }
 
-func FromXY(x,y int) Button {
+func FromXY(x, y int) Button {
 	if x < 0 || y < 0 || x > 8 || y > 8 {
 		return Button(-1)
 	}
@@ -206,11 +217,15 @@ func FromXY(x,y int) Button {
 	if y == 0 { // column
 		return Up + Button(x)
 	} else if x == 8 { // rows
-		return Row1 + Button(y - 1)
+		return Row1 + Button(y-1)
 	} else { // pad
 		y-- // remove coord from cols
 		return Pad11 + Button(x+y*8)
 	}
+}
+
+func FromPadXY(x, y int) Button {
+	return FromXY(x, y-1)
 }
 
 func (b Buttons) Len() int {

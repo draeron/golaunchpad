@@ -1,10 +1,11 @@
 package minimk3
 
 import (
-	"github.com/draeron/golaunchpad/pkg/minimk3/button"
+	"image/color"
+
+	"github.com/draeron/golaunchpad/pkg/launchpad/button"
 	"github.com/draeron/golaunchpad/pkg/minimk3/cmd"
 	"go.uber.org/zap/buffer"
-	"image/color"
 )
 
 type BtnColor struct {
@@ -16,23 +17,26 @@ const (
 	RgbColorInstruction = 3
 )
 
-func (m *Controller) SetBtnColor(btn button.Button, color color.Color) error {
+func (m *Controller) SetColorAll(col color.Color) error {
+	return m.SetColorMany(button.Values(), col)
+}
+
+func (m *Controller) SetColorMany(btns []button.Button, color color.Color) error {
+	bcs := []BtnColor{}
+	for _, btn := range btns {
+		bcs = append(bcs, BtnColor{btn, color})
+	}
+	return m.SetColors(bcs)
+}
+
+func (m *Controller) SetColor(btn button.Button, color color.Color) error {
 	id := btn.Id()
 	r, g, b, _ := color.RGBA()
 	msg := cmd.LedColor.SysEx(3, id, byte(r>>9), byte(g>>9), byte(b>>9))
 	return m.device.SendDaw(msg)
 }
 
-func (m *Controller) ClearColors(col color.Color) error {
-	btns := button.Values()
-	bcs := []BtnColor{}
-	for _, btn := range btns {
-		bcs = append(bcs, BtnColor{btn, col})
-	}
-	return m.SetBtnColors(bcs)
-}
-
-func (m *Controller) SetBtnColors(sets []BtnColor) error {
+func (m *Controller) SetColors(sets []BtnColor) error {
 	buf := buffer.Buffer{}
 	for idx, bc := range sets {
 		if !bc.Btn.IsValid() {
@@ -44,11 +48,16 @@ func (m *Controller) SetBtnColors(sets []BtnColor) error {
 			log.Warnf("sending too many colors (%d) in a single message", len(sets))
 			break
 		}
-		r, g, b, _ := bc.Color.RGBA()
-		if _, err := buf.Write([]byte{RgbColorInstruction, bc.Btn.Id(), byte(r >> 9), byte(g >> 9), byte(b >> 9)}); err != nil {
+		r, g, b := toColorSpec(bc.Color)
+		if _, err := buf.Write([]byte{RgbColorInstruction, bc.Btn.Id(), r, g, b}); err != nil {
 			return err
 		}
 	}
 	msg := cmd.LedColor.SysEx(buf.Bytes()...)
 	return m.device.SendMidi(msg)
+}
+
+func toColorSpec(color color.Color) (byte, byte, byte) {
+	r, g, b, _ := color.RGBA()
+	return byte(r >> 9), byte(g >> 9), byte(b >> 9)
 }

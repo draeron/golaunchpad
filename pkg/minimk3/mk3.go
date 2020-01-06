@@ -3,8 +3,9 @@ package minimk3
 import (
 	"github.com/draeron/golaunchpad/pkg/device"
 	devevt "github.com/draeron/golaunchpad/pkg/device/event"
+	"github.com/draeron/golaunchpad/pkg/launchpad/event"
 	"github.com/draeron/golaunchpad/pkg/minimk3/cmd"
-	"github.com/draeron/golaunchpad/pkg/minimk3/event"
+	"image/color"
 	"regexp"
 )
 
@@ -20,6 +21,7 @@ var (
 	rxMidiIn  = regexp.MustCompile(`MIDIIN([0-9]+) \(LPMiniMK3 MIDI\)`)
 	rxMidiOut = regexp.MustCompile(`MIDIOUT([0-9]+) \(LPMiniMK3 MIDI\)`)
 )
+
 const (
 	Default = Mode(iota)
 	DawMode
@@ -120,6 +122,19 @@ func (m *Controller) DisableProgrammerMode() error {
 	return m.device.SendMidi(msg)
 }
 
+func (m *Controller) DisplayText(text string, loop bool, speed byte, color color.Color) error {
+	log.Debugf("sending text '%s', loop: %v, speed: %d pad/s, color: %v", text, loop, speed, color)
+	loopbyte := byte(0)
+	if loop {
+		loopbyte = 1
+	}
+
+	r, g, b := toColorSpec(color)
+	buf := append([]byte{}, loopbyte, speed, 0x1, r, g, b)
+	buf = append(buf, []byte(text)...)
+	msg := cmd.TextScrolling.SysEx(buf...)
+	return m.device.SendMidi(msg)
+}
 
 func (m *Controller) SelectLayout(layout Layout) error {
 	msg := cmd.SelectLayout.SysEx(layout.value())

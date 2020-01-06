@@ -2,8 +2,9 @@ package event
 
 import (
 	"fmt"
+
 	"github.com/draeron/golaunchpad/pkg/device/event"
-	"github.com/draeron/golaunchpad/pkg/minimk3/button"
+	"github.com/draeron/golaunchpad/pkg/launchpad/button"
 )
 
 type Event struct {
@@ -37,4 +38,3 @@ func FromMidiEvent(evt event.Event) Event {
 
 	return e
 }
-

@@ -2,16 +2,16 @@ package minimk3
 
 //go:generate go-enum -f=$GOFILE
 
-// Layout x ENUM(
 /*
+	Layout x ENUM(
   Session
   Drum
   Keys
   User
   DawFaders
   Programmer
+)
 */
-// )
 type Layout int
 
 var layoutByteValue = map[Layout]byte{

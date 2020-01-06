@@ -2,13 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/draeron/golaunchpad/pkg/minimk3"
-	"github.com/draeron/golaunchpad/pkg/minimk3/button"
-	"github.com/draeron/gopkg/color"
-	"github.com/draeron/gopkg/logger"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/draeron/golaunchpad/examples/utils"
+	"github.com/draeron/golaunchpad/pkg/launchpad/button"
+	"github.com/draeron/golaunchpad/pkg/minimk3"
+	"github.com/draeron/gopkg/color"
+	"github.com/draeron/gopkg/logger"
 )
 
 var log = logger.New("main")
@@ -22,9 +24,9 @@ func main() {
 
 	var err error
 	pad, err = minimk3.Open(minimk3.ProgrammerMode)
-	must(err)
-	must(pad.ClearColors(color.Black))
-	defer pad.ClearColors(color.Black)
+	utils.Must(err)
+	utils.Must(pad.SetColorAll(color.Black))
+	defer pad.SetColorAll(color.Black)
 	defer pad.Close()
 
 	done := make(chan bool, 1)
@@ -36,21 +38,14 @@ func main() {
 		done <- true
 	}()
 
-
-	for _, b := range button.Values(){
+	for _, b := range button.Values() {
 		select {
 		default:
-			pad.SetBtnColor(b, color.White)
-			<- time.After(time.Millisecond * 50)
-			pad.SetBtnColor(b, color.Black)
+			pad.SetColor(b, color.White)
+			<-time.After(time.Millisecond * 50)
+			pad.SetColor(b, color.Black)
 		case <-done:
 			return
 		}
-	}
-}
-
-func must(err error) {
-	if err != nil {
-		panic(err.Error())
 	}
 }

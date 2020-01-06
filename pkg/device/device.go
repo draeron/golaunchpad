@@ -19,8 +19,8 @@ type MiniMk3 struct {
 	dawRdr  *mid.Reader
 	midiRdr *mid.Reader
 
-	dawWr   *mid.Writer
-	midiWr  *mid.Writer
+	dawWr  *mid.Writer
+	midiWr *mid.Writer
 
 	channels []chan<- event.Event
 }
