@@ -4,7 +4,7 @@ import "github.com/draeron/golaunchpad/pkg/launchpad/button"
 
 //go:generate go-enum -f=$GOFILE --noprefix
 
-type Handler func(button button.Button)
+type Handler func(layout *Layout, btn button.Button)
 
 /*
 	HandlerType x ENUM(
@@ -12,8 +12,8 @@ type Handler func(button button.Button)
 	RowReleased
 	PadPressed
 	PadReleased
-	PagePressed
-	PageReleased
+	ModePressed
+	ModeReleased
 	ArrowPressed
 	ArrowReleased
 )

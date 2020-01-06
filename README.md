@@ -26,6 +26,7 @@
 
 - [wave](examples/wave/wave.go): colored wave upon pressing a pad button
 - [scan](examples/scan/scan.go): light up every button one after the other
+- [text](examples/scan/text.go): display pressed coordinate as text
 
 ## Ref
 

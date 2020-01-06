@@ -16,17 +16,17 @@ const (
 	PadPressed
 	// PadReleased is a HandlerType of type PadReleased
 	PadReleased
-	// PagePressed is a HandlerType of type PagePressed
-	PagePressed
-	// PageReleased is a HandlerType of type PageReleased
-	PageReleased
+	// ModePressed is a HandlerType of type ModePressed
+	ModePressed
+	// ModeReleased is a HandlerType of type ModeReleased
+	ModeReleased
 	// ArrowPressed is a HandlerType of type ArrowPressed
 	ArrowPressed
 	// ArrowReleased is a HandlerType of type ArrowReleased
 	ArrowReleased
 )
 
-const _HandlerTypeName = "RowPressedRowReleasedPadPressedPadReleasedPagePressedPageReleasedArrowPressedArrowReleased"
+const _HandlerTypeName = "RowPressedRowReleasedPadPressedPadReleasedModePressedModeReleasedArrowPressedArrowReleased"
 
 var _HandlerTypeMap = map[HandlerType]string{
 	0: _HandlerTypeName[0:10],

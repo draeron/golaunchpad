@@ -6,27 +6,20 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/draeron/golaunchpad/examples/utils"
+	"github.com/draeron/golaunchpad/examples/common"
+	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
-	"github.com/draeron/golaunchpad/pkg/minimk3"
 	"github.com/draeron/gopkg/color"
 	"github.com/draeron/gopkg/logger"
 )
 
 var log = logger.New("main")
-var pad *minimk3.Controller
+var pad launchpad.Controller
 
 func main() {
-	log.Info("starting golaunchpad")
-	defer log.Info("exiting golaunchpad")
-
-	minimk3.SetLogger(logger.New("minimk3"))
-
-	var err error
-	pad, err = minimk3.Open(minimk3.ProgrammerMode)
-	utils.Must(err)
-	utils.Must(pad.SetColorAll(color.Black))
-	defer pad.SetColorAll(color.Black)
+	log.Info("starting scan example")
+	defer log.Info("exiting scan example")
+	pad = common.Setup()
 	defer pad.Close()
 
 	done := make(chan bool, 1)
@@ -38,14 +31,16 @@ func main() {
 		done <- true
 	}()
 
-	for _, b := range button.Values() {
-		select {
-		default:
-			pad.SetColor(b, color.White)
-			<-time.After(time.Millisecond * 50)
-			pad.SetColor(b, color.Black)
-		case <-done:
-			return
+	for {
+		for _, b := range button.Values() {
+			select {
+			default:
+				pad.SetColor(b, color.White)
+				<-time.After(time.Millisecond * 50)
+				pad.SetColor(b, color.Black)
+			case <-done:
+				return
+			}
 		}
 	}
 }

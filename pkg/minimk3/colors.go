@@ -8,11 +8,6 @@ import (
 	"go.uber.org/zap/buffer"
 )
 
-type BtnColor struct {
-	Btn   button.Button
-	Color color.Color
-}
-
 const (
 	RgbColorInstruction = 3
 )
@@ -21,12 +16,12 @@ func (m *Controller) SetColorAll(col color.Color) error {
 	return m.SetColorMany(button.Values(), col)
 }
 
-func (m *Controller) SetColorMany(btns []button.Button, color color.Color) error {
-	bcs := []BtnColor{}
-	for _, btn := range btns {
-		bcs = append(bcs, BtnColor{btn, color})
+func (m *Controller) SetColorMany(btns []button.Button, col color.Color) error {
+	mapp := map[button.Button]color.Color{}
+	for _, b := range btns {
+		mapp[b] = col
 	}
-	return m.SetColors(bcs)
+	return m.SetColors(mapp)
 }
 
 func (m *Controller) SetColor(btn button.Button, color color.Color) error {
@@ -36,20 +31,23 @@ func (m *Controller) SetColor(btn button.Button, color color.Color) error {
 	return m.device.SendDaw(msg)
 }
 
-func (m *Controller) SetColors(sets []BtnColor) error {
+func (m *Controller) SetColors(mapp button.ColorMap) error {
 	buf := buffer.Buffer{}
-	for idx, bc := range sets {
-		if !bc.Btn.IsValid() {
+	idx := 0
+	for btn, col := range mapp {
+		if !btn.IsValid() {
 			continue
 		}
 
+		idx++
+
 		// the launchpad accept up to a maximum of 81 color spec per message
 		if idx > 81 {
-			log.Warnf("sending too many colors (%d) in a single message", len(sets))
+			log.Warnf("sending too many colors (%d) in a single message", len(mapp))
 			break
 		}
-		r, g, b := toColorSpec(bc.Color)
-		if _, err := buf.Write([]byte{RgbColorInstruction, bc.Btn.Id(), r, g, b}); err != nil {
+		r, g, b := toColorSpec(col)
+		if _, err := buf.Write([]byte{RgbColorInstruction, btn.Id(), r, g, b}); err != nil {
 			return err
 		}
 	}

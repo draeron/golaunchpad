@@ -2,32 +2,26 @@ package main
 
 import (
 	"fmt"
-	"github.com/draeron/golaunchpad/examples/utils"
+	"github.com/draeron/golaunchpad/examples/common"
+	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
 	"github.com/draeron/golaunchpad/pkg/launchpad/event"
-	"github.com/draeron/golaunchpad/pkg/minimk3"
 	"github.com/draeron/gopkg/color"
 	"github.com/draeron/gopkg/logger"
 )
 
 var log = logger.New("main")
-var pad *minimk3.Controller
+var pad launchpad.Controller
 
 func main() {
-	log.Info("starting golaunchpad")
-	defer log.Info("exiting golaunchpad")
-
-	minimk3.SetLogger(logger.New("minimk3"))
-
-	var err error
-	pad, err = minimk3.Open(minimk3.ProgrammerMode)
-	utils.Must(err)
+	log.Info("starting text example")
+	defer log.Info("exiting text example")
+	pad = common.Setup()
 	defer pad.Close()
-	utils.Must(pad.Diag())
 
 	setup()
 
-	utils.WaitExit()
+	common.WaitExit()
 
 	pad.DisplayText("", false, 0x40, color.White)
 }
@@ -78,7 +72,7 @@ func setup() {
 
 				case e.Btn.IsPad():
 					x, y := e.Btn.Coord()
-					lastColor = utils.RandColor()
+					lastColor = common.RandColor()
 					pad.DisplayText(fmt.Sprintf("X: %d, Y: %d", x, y), loop, speed, lastColor)
 				}
 			}
@@ -87,5 +81,5 @@ func setup() {
 }
 
 func colorFromRow(b button.Button) color.RGB {
-	return color.Palette[b - button.Row1]
+	return color.Palette[b-button.Row1]
 }

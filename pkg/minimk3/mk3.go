@@ -5,6 +5,7 @@ import (
 	devevt "github.com/draeron/golaunchpad/pkg/device/event"
 	"github.com/draeron/golaunchpad/pkg/launchpad/event"
 	"github.com/draeron/golaunchpad/pkg/minimk3/cmd"
+	"github.com/sasha-s/go-deadlock"
 	"image/color"
 	"regexp"
 )
@@ -14,6 +15,7 @@ type Controller struct {
 	mode        Mode
 	subscribers []chan<- event.Event
 	eventsChan  chan devevt.Event
+	mutex       deadlock.RWMutex
 }
 
 var (
@@ -58,7 +60,7 @@ func Open(mode Mode) (*Controller, error) {
 
 	pad.IsAwake()
 	pad.Wake()
-	pad.eventsChan = make(chan devevt.Event)
+	pad.eventsChan = make(chan devevt.Event, 20)
 	pad.device.Subscribe(pad.eventsChan)
 	pad.Diag()
 
@@ -74,7 +76,7 @@ func Open(mode Mode) (*Controller, error) {
 func (m *Controller) EnableDebugLogger() {
 	go func() {
 		log.Debugf("enable debug logging of events")
-		ch := make(chan devevt.Event)
+		ch := make(chan devevt.Event, 20)
 		m.device.Subscribe(ch)
 		for evt := range ch {
 			//log.Debugf("%s", evt.String())

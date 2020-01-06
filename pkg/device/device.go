@@ -8,6 +8,7 @@ import (
 	"gitlab.com/gomidi/midi/mid"
 	"gitlab.com/gomidi/midi/midimessage/realtime"
 	"gitlab.com/gomidi/midi/midireader"
+	"sync"
 )
 
 type MiniMk3 struct {
@@ -23,6 +24,8 @@ type MiniMk3 struct {
 	midiWr *mid.Writer
 
 	channels []chan<- event.Event
+
+	mutex sync.Mutex
 }
 
 func (m *MiniMk3) Open() error {
@@ -68,6 +71,8 @@ func (m *MiniMk3) Open() error {
 }
 
 func (m *MiniMk3) Subscribe(channel chan<- event.Event) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	m.channels = append(m.channels, channel)
 }
 
