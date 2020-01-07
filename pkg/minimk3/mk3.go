@@ -5,9 +5,9 @@ import (
 	devevt "github.com/draeron/golaunchpad/pkg/device/event"
 	"github.com/draeron/golaunchpad/pkg/launchpad/event"
 	"github.com/draeron/golaunchpad/pkg/minimk3/cmd"
-	"github.com/sasha-s/go-deadlock"
 	"image/color"
 	"regexp"
+	"sync"
 )
 
 type Controller struct {
@@ -15,7 +15,7 @@ type Controller struct {
 	mode        Mode
 	subscribers []chan<- event.Event
 	eventsChan  chan devevt.Event
-	mutex       deadlock.RWMutex
+	mutex       sync.RWMutex
 }
 
 var (

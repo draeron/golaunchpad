@@ -20,12 +20,12 @@ type Mask map[button.Button]bool
 /*
 	Remove
 */
-func (m Mask) Intersect(mapp button.ColorMap) button.ColorMap {
+func (m Mask) Intersect(mapp ButtonStateMap) button.ColorMap {
 	out := make(button.ColorMap)
 	for k, v := range m {
 		if v {
 			if cl, ok := mapp[k]; ok {
-				out[k] = cl
+				out[k] = cl.Color
 			}
 		}
 	}

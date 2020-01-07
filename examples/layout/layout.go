@@ -46,10 +46,11 @@ func setup() {
 		pads[i].DebugName = id.String()
 		pads[i].Connect(device)
 		pads[i].SetHandler(launchpad.PadPressed, func(layout *launchpad.Layout, btn button.Button) {
-			if layout.Color(btn) != color.Black {
-				layout.SetColor(btn, color.Black)
-			} else {
+			col := color.FromColor(layout.Color(btn))
+			if col.Equal(color.Black) {
 				layout.SetColor(btn, common.RandColor())
+			} else {
+				layout.SetColor(btn, color.Black)
 			}
 		})
 		pads[i].SetColorAll(color.Black)

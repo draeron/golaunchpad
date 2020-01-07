@@ -1,26 +1,26 @@
 package launchpad
 
 import (
-	"github.com/draeron/golaunchpad/pkg/launchpad/event"
-	"github.com/sasha-s/go-deadlock"
-	"go.uber.org/atomic"
 	"image/color"
+	"sync"
 	"time"
 
+	"github.com/draeron/golaunchpad/pkg/launchpad/event"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
+	"go.uber.org/atomic"
+
 )
 
 type Layout struct {
 	DebugName  string
-	colors     button.ColorMap
+	state      ButtonStateMap
 	lastColors button.ColorMap
-	pressed    map[button.Button]time.Time
 	controler  Controller
 	handlers   handlersMap
 	enabled    atomic.Bool
 	eventsCh   chan (event.Event)
 	mask       Mask
-	mutex      deadlock.RWMutex
+	mutex      sync.RWMutex
 	ticker     *time.Ticker
 }
 
@@ -31,13 +31,14 @@ func NewLayoutPreset(preset MaskPreset) *Layout {
 }
 
 func NewLayout(mask Mask) *Layout {
-	return &Layout{
-		colors:     button.ColorMap{},
+	l := &Layout{
+		state:      ButtonStateMap{},
 		lastColors: button.ColorMap{},
-		pressed:    map[button.Button]time.Time{},
 		handlers:   handlersMap{},
 		mask:       mask,
 	}
+	l.state.SetColors(mask, color.Black) // allocated state
+	return l
 }
 
 func (l *Layout) Connect(controller Controller) {
@@ -77,8 +78,7 @@ func (l *Layout) Disable() {
 
 	// clear last displayed
 	l.lastColors = button.ColorMap{}
-	// clear pressed timers
-	l.pressed = map[button.Button]time.Time{}
+	l.state.ResetPressed()
 }
 
 func (l *Layout) SetHandler(htype HandlerType, handler Handler) {
@@ -86,18 +86,15 @@ func (l *Layout) SetHandler(htype HandlerType, handler Handler) {
 }
 
 func (l *Layout) HoldTime(btn button.Button) time.Duration {
-	if start, ok := l.pressed[btn]; ok {
-		return time.Now().Sub(start)
-	}
-	return 0
+	return l.state.HoldTime(btn)
 }
 
 func (l *Layout) IsPressed(btn button.Button) bool {
-	return l.HoldTime(btn) > 0
+	return l.state.IsPressed(btn)
 }
 
 func (l *Layout) IsHold(btn button.Button, threshold time.Duration) bool {
-	return l.HoldTime(btn) > threshold
+	return l.state.IsHold(btn, threshold)
 }
 
 func (l *Layout) UpdateDevice() error {
@@ -109,7 +106,7 @@ func (l *Layout) UpdateDevice() error {
 			return nil
 		}
 
-		colors := l.mask.Intersect(l.colors).DiffFrom(l.lastColors)
+		colors := l.mask.Intersect(l.state).DiffFrom(l.lastColors)
 
 		if len(colors) > 0 {
 			err := l.controler.SetColors(colors)
@@ -124,20 +121,13 @@ func (l *Layout) Color(btn button.Button) color.Color {
 	l.mutex.RLock()
 	defer l.mutex.RUnlock()
 
-	if c, ok := l.colors[btn]; ok {
-		return c
-	} else {
-		return color.Black
-	}
+	return l.state.Color(btn)
 }
 
 func (l *Layout) SetColorAll(col color.Color) error {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
-	for k, _ := range l.mask {
-		l.colors[k] = col
-	}
 	return nil
 }
 
@@ -146,7 +136,7 @@ func (l *Layout) SetColorMany(btns []button.Button, color color.Color) error {
 	defer l.mutex.Unlock()
 
 	for _, k := range btns {
-		l.colors[k] = color
+		l.state.SetColor(k, color)
 	}
 	return nil
 }
@@ -155,17 +145,15 @@ func (l *Layout) SetColor(btn button.Button, color color.Color) error {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
-	l.colors[btn] = color
+	l.state.SetColor(btn, color)
 	return nil
 }
 
-func (l *Layout) SetColors(sets button.ColorMap) error {
+func (l *Layout) SetColors(set button.ColorMap) error {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
-	for k, v := range sets {
-		l.colors[k] = v
-	}
+	l.state.SetColorsMap(set)
 	return nil
 }
 
@@ -182,7 +170,7 @@ func (l *Layout) tickEvents() {
 
 func (l *Layout) tickUpdate() {
 	l.mutex.Lock()
-	l.ticker = time.NewTicker(time.Second/60)
+	l.ticker = time.NewTicker(time.Second / 60)
 	l.mutex.Unlock()
 
 	for range l.ticker.C {
@@ -228,9 +216,9 @@ func (l *Layout) dispatch(e event.Event) {
 
 	l.mutex.Lock()
 	if e.Type == event.Pressed {
-		l.pressed[e.Btn] = time.Now()
+		l.state.Press(e.Btn)
 	} else {
-		delete(l.pressed, e.Btn)
+		l.state.Release(e.Btn)
 	}
 	l.mutex.Unlock()
 
