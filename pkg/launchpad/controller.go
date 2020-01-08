@@ -22,7 +22,7 @@ type Controller interface {
 	Print()
 	Subscribe(channel chan<- event.Event)
 	DisplayText(text string, loop bool, speed byte, color color.Color) error
-
+	Name() string
 	Colorer
 }
 

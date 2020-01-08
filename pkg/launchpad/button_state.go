@@ -11,9 +11,7 @@ type ButtonState struct {
 	pressTime time.Time
 }
 
-type ButtonStateMap map[button.Button]ButtonState
-
-var zeroTime = time.Time{}
+type ButtonStateMap map[button.Button]*ButtonState
 
 func (bm ButtonStateMap) Press(btn button.Button) {
 	if b, ok := bm[btn]; ok {
@@ -22,12 +20,12 @@ func (bm ButtonStateMap) Press(btn button.Button) {
 
 func (bm ButtonStateMap) Release(btn button.Button) {
 	if b, ok := bm[btn]; ok {
-		b.pressTime = zeroTime
+		b.pressTime = time.Time{}
 	}
 }
 
 func (bm ButtonStateMap) HoldTime(btn button.Button) time.Duration {
-	if b, ok := bm[btn]; ok {
+	if b, ok := bm[btn]; ok && !b.pressTime.IsZero() {
 		return time.Now().Sub(b.pressTime)
 	}
 	return 0
@@ -46,7 +44,7 @@ func (bm ButtonStateMap) SetColor(btn button.Button, col color.Color) {
 	if b, ok := bm[btn]; ok {
 		val.pressTime = b.pressTime
 	}
-	bm[btn] = val
+	bm[btn] = &val
 }
 
 func (bm ButtonStateMap) SetColorsMap(mapp button.ColorMap) {
@@ -70,6 +68,6 @@ func (bm ButtonStateMap) Color(button button.Button) color.Color {
 
 func (bm ButtonStateMap) ResetPressed() {
 	for _, b := range bm {
-		b.pressTime = zeroTime
+		b.pressTime = time.Time{}
 	}
 }

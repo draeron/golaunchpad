@@ -95,6 +95,11 @@ func (m *Controller) Close() {
 	m.device.Close()
 }
 
+func (m *Controller) Name() string {
+	// todo: add index to name?
+	return "MiniMk3"
+}
+
 func (m *Controller) SetBrightness(level byte) error {
 	msg := cmd.BrightnessLevel.SysEx(level)
 	return m.device.SendMidi(msg)

@@ -8,10 +8,16 @@ import (
 	"github.com/draeron/golaunchpad/pkg/launchpad/event"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
 	"go.uber.org/atomic"
-
 )
 
-type Layout struct {
+type Layout interface {
+	Connect(controller Controller)
+	Disconnect()
+	Activate()
+	Deactivate()
+}
+
+type BasicLayout struct {
 	DebugName  string
 	state      ButtonStateMap
 	lastColors button.ColorMap
@@ -22,37 +28,52 @@ type Layout struct {
 	mask       Mask
 	mutex      sync.RWMutex
 	ticker     *time.Ticker
+
+	holdTimer        map[HandlerType]time.Duration
+	holdTimerDefault time.Duration
 }
 
 type handlersMap map[HandlerType]Handler
 
-func NewLayoutPreset(preset MaskPreset) *Layout {
+const defaultHoldDuration = time.Millisecond * 250
+
+func NewLayoutPreset(preset MaskPreset) *BasicLayout {
 	return NewLayout(preset.Mask())
 }
 
-func NewLayout(mask Mask) *Layout {
-	l := &Layout{
+func NewLayout(mask Mask) *BasicLayout {
+	l := &BasicLayout{
 		state:      ButtonStateMap{},
 		lastColors: button.ColorMap{},
 		handlers:   handlersMap{},
 		mask:       mask,
+		holdTimerDefault: defaultHoldDuration,
+		holdTimer:  map[HandlerType]time.Duration{},
 	}
 	l.state.SetColors(mask, color.Black) // allocated state
 	return l
 }
 
-func (l *Layout) Connect(controller Controller) {
+func (l *BasicLayout) Connect(controller Controller) {
 	l.mutex.Lock()
 	l.controler = controller
 	l.mutex.Unlock()
+
+	if l.DebugName != "" {
+		log.Infof("connecting layout %s to controller %s", l.DebugName, controller.Name())
+	}
 
 	go l.tickEvents()
 	go l.tickUpdate()
 }
 
-func (l *Layout) Disconnect() {
+func (l *BasicLayout) Disconnect() {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
+
+	if l.DebugName != "" {
+		log.Infof("disconnecting layout %s from controller %s", l.DebugName, l.controler.Name())
+	}
 
 	close(l.eventsCh)
 	l.controler = nil
@@ -63,14 +84,14 @@ func (l *Layout) Disconnect() {
 /*
 	When enabling a layout, it will transfert it's color state to
 */
-func (l *Layout) Enable() {
+func (l *BasicLayout) Activate() {
 	l.enabled.Store(true)
 }
 
 /*
 	When disabling a layout, any pressed state will be deleted
 */
-func (l *Layout) Disable() {
+func (l *BasicLayout) Deactivate() {
 	l.enabled.Store(false)
 
 	l.mutex.Lock()
@@ -81,23 +102,31 @@ func (l *Layout) Disable() {
 	l.state.ResetPressed()
 }
 
-func (l *Layout) SetHandler(htype HandlerType, handler Handler) {
+func (l *BasicLayout) SetHandler(htype HandlerType, handler Handler) {
 	l.handlers[htype] = handler
 }
 
-func (l *Layout) HoldTime(btn button.Button) time.Duration {
+func (l *BasicLayout) SetHoldTimer(htype HandlerType, duration time.Duration) {
+	l.holdTimer[htype] = duration
+}
+
+func (l *BasicLayout) SetDefaultHoldTimer(duration time.Duration) {
+	l.holdTimerDefault = duration
+}
+
+func (l *BasicLayout) HoldTime(btn button.Button) time.Duration {
 	return l.state.HoldTime(btn)
 }
 
-func (l *Layout) IsPressed(btn button.Button) bool {
+func (l *BasicLayout) IsPressed(btn button.Button) bool {
 	return l.state.IsPressed(btn)
 }
 
-func (l *Layout) IsHold(btn button.Button, threshold time.Duration) bool {
+func (l *BasicLayout) IsHold(btn button.Button, threshold time.Duration) bool {
 	return l.state.IsHold(btn, threshold)
 }
 
-func (l *Layout) UpdateDevice() error {
+func (l *BasicLayout) UpdateDevice() error {
 	if l.enabled.Load() {
 		l.mutex.Lock()
 		defer l.mutex.Unlock()
@@ -117,21 +146,21 @@ func (l *Layout) UpdateDevice() error {
 	return nil
 }
 
-func (l *Layout) Color(btn button.Button) color.Color {
+func (l *BasicLayout) Color(btn button.Button) color.Color {
 	l.mutex.RLock()
 	defer l.mutex.RUnlock()
 
 	return l.state.Color(btn)
 }
 
-func (l *Layout) SetColorAll(col color.Color) error {
+func (l *BasicLayout) SetColorAll(col color.Color) error {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
 	return nil
 }
 
-func (l *Layout) SetColorMany(btns []button.Button, color color.Color) error {
+func (l *BasicLayout) SetColorMany(btns []button.Button, color color.Color) error {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
@@ -141,7 +170,7 @@ func (l *Layout) SetColorMany(btns []button.Button, color color.Color) error {
 	return nil
 }
 
-func (l *Layout) SetColor(btn button.Button, color color.Color) error {
+func (l *BasicLayout) SetColor(btn button.Button, color color.Color) error {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
@@ -149,7 +178,7 @@ func (l *Layout) SetColor(btn button.Button, color color.Color) error {
 	return nil
 }
 
-func (l *Layout) SetColors(set button.ColorMap) error {
+func (l *BasicLayout) SetColors(set button.ColorMap) error {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
@@ -157,7 +186,7 @@ func (l *Layout) SetColors(set button.ColorMap) error {
 	return nil
 }
 
-func (l *Layout) tickEvents() {
+func (l *BasicLayout) tickEvents() {
 	l.mutex.Lock()
 	l.eventsCh = make(chan event.Event, 20)
 	l.controler.Subscribe(l.eventsCh)
@@ -168,7 +197,7 @@ func (l *Layout) tickEvents() {
 	}
 }
 
-func (l *Layout) tickUpdate() {
+func (l *BasicLayout) tickUpdate() {
 	l.mutex.Lock()
 	l.ticker = time.NewTicker(time.Second / 60)
 	l.mutex.Unlock()
@@ -178,7 +207,7 @@ func (l *Layout) tickUpdate() {
 	}
 }
 
-func (l *Layout) dispatch(e event.Event) {
+func (l *BasicLayout) dispatch(e event.Event) {
 	if !l.enabled.Load() || !l.mask[e.Btn] {
 		return
 	}
@@ -221,6 +250,25 @@ func (l *Layout) dispatch(e event.Event) {
 		l.state.Release(e.Btn)
 	}
 	l.mutex.Unlock()
+
+	if e.Type == event.Pressed {
+		if handle, ok := l.handlers[ht+1]; ok {
+			timer := l.holdTimerDefault
+			if t, ok := l.holdTimer[ht+1]; ok {
+				timer = t
+			}
+			go func() {
+				for {
+					<- time.After(timer)
+					if l.state.IsHold(e.Btn, timer) {
+						handle(l, e.Btn)
+					} else {
+						return
+					}
+				}
+			}()
+		}
+	}
 
 	if h, ok := l.handlers[ht]; ok {
 		h(l, e.Btn)

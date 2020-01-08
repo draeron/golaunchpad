@@ -11,8 +11,8 @@ import (
 var log = logger.New("main")
 var device launchpad.Controller
 
-var top *launchpad.Layout
-var pads [4]*launchpad.Layout
+var top *launchpad.BasicLayout
+var pads [4]*launchpad.BasicLayout
 var currentMode = 0
 var modeColors = []color.Color{ color.Red, color.Blue, color.Green, color.Yellow }
 
@@ -30,10 +30,10 @@ func main() {
 func setup() {
 	top = launchpad.NewLayoutPreset(launchpad.MaskTop)
 	top.DebugName = "top"
-	top.SetHandler(launchpad.ModePressed, func(layout *launchpad.Layout, btn button.Button) {
-		pads[currentMode].Disable()
+	top.SetHandler(launchpad.ModePressed, func(layout *launchpad.BasicLayout, btn button.Button) {
+		pads[currentMode].Deactivate()
 		currentMode = int(btn - button.Session)
-		pads[currentMode].Enable()
+		pads[currentMode].Activate()
 		top.SetColor(button.Logo, modeColors[currentMode])
 		log.Infof("switched to mode %s", btn)
 	})
@@ -45,7 +45,7 @@ func setup() {
 		pads[i] = launchpad.NewLayoutPreset(launchpad.MaskPad)
 		pads[i].DebugName = id.String()
 		pads[i].Connect(device)
-		pads[i].SetHandler(launchpad.PadPressed, func(layout *launchpad.Layout, btn button.Button) {
+		pads[i].SetHandler(launchpad.PadPressed, func(layout *launchpad.BasicLayout, btn button.Button) {
 			col := color.FromColor(layout.Color(btn))
 			if col.Equal(color.Black) {
 				layout.SetColor(btn, common.RandColor())
@@ -57,7 +57,7 @@ func setup() {
 	}
 
 	top.Connect(device)
-	top.Enable()
-	pads[currentMode].Enable()
+	top.Activate()
+	pads[currentMode].Activate()
 	log.Infof("switched to mode %v", button.Session)
 }

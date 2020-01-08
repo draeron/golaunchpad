@@ -225,7 +225,7 @@ func FromXY(x, y int) Button {
 }
 
 func FromPadXY(x, y int) Button {
-	return FromXY(x, y-1)
+	return FromXY(x, y+1)
 }
 
 func (b Buttons) Len() int {

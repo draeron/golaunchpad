@@ -32,8 +32,16 @@ func (m Mask) Intersect(mapp ButtonStateMap) button.ColorMap {
 	return out
 }
 
+func (m Mask) MergePreset(masks... MaskPreset) Mask {
+	out := m
+	for _, mask := range masks {
+		out.Merge(mask.Mask())
+	}
+	return out
+}
+
 func (m Mask) Merge(masks... Mask) Mask {
-	out := Mask{}
+	out := m
 	for _, mask := range masks {
 		for b, v := range mask {
 			out[b] = v

@@ -10,33 +10,45 @@ import (
 const (
 	// RowPressed is a HandlerType of type RowPressed
 	RowPressed HandlerType = iota
+	// RowHold is a HandlerType of type RowHold
+	RowHold
 	// RowReleased is a HandlerType of type RowReleased
 	RowReleased
 	// PadPressed is a HandlerType of type PadPressed
 	PadPressed
+	// PadHold is a HandlerType of type PadHold
+	PadHold
 	// PadReleased is a HandlerType of type PadReleased
 	PadReleased
 	// ModePressed is a HandlerType of type ModePressed
 	ModePressed
+	// ModeHold is a HandlerType of type ModeHold
+	ModeHold
 	// ModeReleased is a HandlerType of type ModeReleased
 	ModeReleased
 	// ArrowPressed is a HandlerType of type ArrowPressed
 	ArrowPressed
+	// ArrowHold is a HandlerType of type ArrowHold
+	ArrowHold
 	// ArrowReleased is a HandlerType of type ArrowReleased
 	ArrowReleased
 )
 
-const _HandlerTypeName = "RowPressedRowReleasedPadPressedPadReleasedModePressedModeReleasedArrowPressedArrowReleased"
+const _HandlerTypeName = "RowPressedRowHoldRowReleasedPadPressedPadHoldPadReleasedModePressedModeHoldModeReleasedArrowPressedArrowHoldArrowReleased"
 
 var _HandlerTypeMap = map[HandlerType]string{
-	0: _HandlerTypeName[0:10],
-	1: _HandlerTypeName[10:21],
-	2: _HandlerTypeName[21:31],
-	3: _HandlerTypeName[31:42],
-	4: _HandlerTypeName[42:53],
-	5: _HandlerTypeName[53:65],
-	6: _HandlerTypeName[65:77],
-	7: _HandlerTypeName[77:90],
+	0:  _HandlerTypeName[0:10],
+	1:  _HandlerTypeName[10:17],
+	2:  _HandlerTypeName[17:28],
+	3:  _HandlerTypeName[28:38],
+	4:  _HandlerTypeName[38:45],
+	5:  _HandlerTypeName[45:56],
+	6:  _HandlerTypeName[56:67],
+	7:  _HandlerTypeName[67:75],
+	8:  _HandlerTypeName[75:87],
+	9:  _HandlerTypeName[87:99],
+	10: _HandlerTypeName[99:108],
+	11: _HandlerTypeName[108:121],
 }
 
 func (i HandlerType) String() string {
@@ -47,14 +59,18 @@ func (i HandlerType) String() string {
 }
 
 var _HandlerTypeValue = map[string]HandlerType{
-	_HandlerTypeName[0:10]:  0,
-	_HandlerTypeName[10:21]: 1,
-	_HandlerTypeName[21:31]: 2,
-	_HandlerTypeName[31:42]: 3,
-	_HandlerTypeName[42:53]: 4,
-	_HandlerTypeName[53:65]: 5,
-	_HandlerTypeName[65:77]: 6,
-	_HandlerTypeName[77:90]: 7,
+	_HandlerTypeName[0:10]:    0,
+	_HandlerTypeName[10:17]:   1,
+	_HandlerTypeName[17:28]:   2,
+	_HandlerTypeName[28:38]:   3,
+	_HandlerTypeName[38:45]:   4,
+	_HandlerTypeName[45:56]:   5,
+	_HandlerTypeName[56:67]:   6,
+	_HandlerTypeName[67:75]:   7,
+	_HandlerTypeName[75:87]:   8,
+	_HandlerTypeName[87:99]:   9,
+	_HandlerTypeName[99:108]:  10,
+	_HandlerTypeName[108:121]: 11,
 }
 
 // ParseHandlerType attempts to convert a string to a HandlerType

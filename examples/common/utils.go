@@ -83,7 +83,7 @@ func Setup() launchpad.Controller {
 	device.SetLogger(logger.New("device"))
 	minimk3.SetLogger(logger.New("minimk3"))
 
-	//common.StartProfiling()
+	//StartProfiling()
 
 	pad, err := minimk3.Open(minimk3.ProgrammerMode)
 	Must(err)
