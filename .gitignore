@@ -28,3 +28,6 @@ $RECYCLE.BIN/
 / IDEs
 .idea/
 .vscode/
+.test/
+
+*.pprof
