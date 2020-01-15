@@ -1,6 +1,7 @@
 package minimk3
 
 import (
+	seven_bits "github.com/draeron/golaunchpad/pkg/colors/7bits"
 	"image/color"
 
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
@@ -17,17 +18,19 @@ func (m *Controller) SetColorAll(col color.Color) error {
 }
 
 func (m *Controller) SetColorMany(btns []button.Button, col color.Color) error {
-	mapp := map[button.Button]color.Color{}
+	mapp := button.ColorMap{}
+	t := seven_bits.FromColor(col)
 	for _, b := range btns {
-		mapp[b] = col
+		mapp[b] = t
 	}
 	return m.SetColors(mapp)
 }
 
 func (m *Controller) SetColor(btn button.Button, color color.Color) error {
 	id := btn.Id()
-	r, g, b, _ := color.RGBA()
-	msg := cmd.LedColor.SysEx(3, id, byte(r>>9), byte(g>>9), byte(b>>9))
+	rgb := seven_bits.FromColor(color)
+	// convert from 16 bits to 7 bits
+	msg := cmd.LedColor.SysEx(3, id, rgb.R, rgb.G, rgb.B)
 	return m.device.SendDaw(msg)
 }
 
@@ -46,16 +49,10 @@ func (m *Controller) SetColors(mapp button.ColorMap) error {
 			log.Warnf("sending too many colors (%d) in a single message", len(mapp))
 			break
 		}
-		r, g, b := toColorSpec(col)
-		if _, err := buf.Write([]byte{RgbColorInstruction, btn.Id(), r, g, b}); err != nil {
+		if _, err := buf.Write([]byte{RgbColorInstruction, btn.Id(), col.R, col.G, col.B}); err != nil {
 			return err
 		}
 	}
 	msg := cmd.LedColor.SysEx(buf.Bytes()...)
 	return m.device.SendMidi(msg)
-}
-
-func toColorSpec(color color.Color) (byte, byte, byte) {
-	r, g, b, _ := color.RGBA()
-	return byte(r >> 9), byte(g >> 9), byte(b >> 9)
 }

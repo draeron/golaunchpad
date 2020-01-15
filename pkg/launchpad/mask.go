@@ -1,6 +1,9 @@
 package launchpad
 
-import "github.com/draeron/golaunchpad/pkg/launchpad/button"
+import (
+	seven_bits "github.com/draeron/golaunchpad/pkg/colors/7bits"
+	"github.com/draeron/golaunchpad/pkg/launchpad/button"
+)
 
 //go:generate go-enum -f=$GOFILE --noprefix
 /*
@@ -25,7 +28,7 @@ func (m Mask) Intersect(mapp ButtonStateMap) button.ColorMap {
 	for k, v := range m {
 		if v {
 			if cl, ok := mapp[k]; ok {
-				out[k] = cl.Color
+				out[k] = seven_bits.FromColor(cl.Color)
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 package minimk3
 
 import (
+	seven_bits "github.com/draeron/golaunchpad/pkg/colors/7bits"
 	"github.com/draeron/golaunchpad/pkg/device"
 	devevt "github.com/draeron/golaunchpad/pkg/device/event"
 	"github.com/draeron/golaunchpad/pkg/launchpad/event"
@@ -136,8 +137,8 @@ func (m *Controller) DisplayText(text string, loop bool, speed byte, color color
 		loopbyte = 1
 	}
 
-	r, g, b := toColorSpec(color)
-	buf := append([]byte{}, loopbyte, speed, 0x1, r, g, b)
+	rgb := seven_bits.FromColor(color)
+	buf := append([]byte{}, loopbyte, speed, 0x1, rgb.R, rgb.G, rgb.B)
 	buf = append(buf, []byte(text)...)
 	msg := cmd.TextScrolling.SysEx(buf...)
 	return m.device.SendMidi(msg)

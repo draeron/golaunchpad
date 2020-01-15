@@ -33,7 +33,7 @@ type BasicLayout struct {
 	holdTimerDefault time.Duration
 }
 
-type handlersMap map[HandlerType]Handler
+type handlersMap map[HandlerType]HoldHandler
 
 const defaultHoldDuration = time.Millisecond * 250
 
@@ -102,7 +102,18 @@ func (l *BasicLayout) Deactivate() {
 	l.state.ResetPressed()
 }
 
+/*
+	The handler will be
+ */
 func (l *BasicLayout) SetHandler(htype HandlerType, handler Handler) {
+	l.handlers[htype] = func(layout *BasicLayout, btn button.Button, first bool) {
+		if first {
+			handler(layout, btn)
+		}
+	}
+}
+
+func (l *BasicLayout) SetHandlerHold(htype HandlerType, handler HoldHandler) {
 	l.handlers[htype] = handler
 }
 
@@ -156,6 +167,21 @@ func (l *BasicLayout) Color(btn button.Button) color.Color {
 func (l *BasicLayout) SetColorAll(col color.Color) error {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
+
+	for b, _ := range l.state {
+		l.state.SetColor(b, col)
+	}
+
+	return nil
+}
+
+func (l *BasicLayout) SetColorMask(mask MaskPreset, col color.Color) error {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
+	for b, _ := range mask.Mask() {
+		l.state.SetColor(b, col)
+	}
 
 	return nil
 }
@@ -258,10 +284,12 @@ func (l *BasicLayout) dispatch(e event.Event) {
 				timer = t
 			}
 			go func() {
+				first := false
 				for {
 					<- time.After(timer)
 					if l.state.IsHold(e.Btn, timer) {
-						handle(l, e.Btn)
+						handle(l, e.Btn, first)
+						first = !first
 					} else {
 						return
 					}
@@ -271,6 +299,6 @@ func (l *BasicLayout) dispatch(e event.Event) {
 	}
 
 	if h, ok := l.handlers[ht]; ok {
-		h(l, e.Btn)
+		h(l, e.Btn, true)
 	}
 }

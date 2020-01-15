@@ -13,8 +13,8 @@ var log = logger.New("main")
 var device launchpad.Controller
 
 func main() {
-	log.Info("starting layout example")
-	defer log.Info("exiting layout example")
+	log.Info("starting grid example")
+	defer log.Info("exiting grid example")
 	device = common.Setup()
 	defer device.Close()
 

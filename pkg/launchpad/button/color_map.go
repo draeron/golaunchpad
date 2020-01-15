@@ -1,8 +1,8 @@
 package button
 
-import "image/color"
+import color "github.com/draeron/golaunchpad/pkg/colors/7bits"
 
-type ColorMap map[Button]color.Color
+type ColorMap map[Button]color.SevenColor
 
 func (c ColorMap) ApplyFrom(other ColorMap) ColorMap {
 	for k, v := range other {
@@ -11,14 +11,15 @@ func (c ColorMap) ApplyFrom(other ColorMap) ColorMap {
 	return c
 }
 
-func (c ColorMap) DiffFrom(other ColorMap) ColorMap {
+func (c ColorMap) DiffFrom(cmap ColorMap) ColorMap {
 	out := ColorMap{}
+
 	for btn, col := range c {
-		if other, ok := other[btn]; ok {
-			if other != col {
+		if other, ok := cmap[btn]; ok {
+			if !col.IsSame(other) {
 				out[btn] = col
 			}
-		} else {
+		} else { // missing color considered changed too
 			out[btn] = col
 		}
 	}

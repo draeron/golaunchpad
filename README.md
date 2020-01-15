@@ -48,7 +48,7 @@ contains basic setup and are use as integration tests.
 
 - [ ] dynamic expansion of grid layout
 - [ ] color flash (sofware)
-- [ ] color animation (blending)
+- [x] color animation (blending)
 
 ### Other
 
@@ -61,6 +61,7 @@ contains basic setup and are use as integration tests.
 - [text](examples/scan/text.go): display pressed coordinate as text
 - [layout](examples/layout/layout.go): press pad to light up buttons, use top button to select pages
 - [grid](examples/grid/grid.go): use arrow to scroll through a grid, _user_ button toggle wrapping mode
+- [blend](examples/blend/blend.go): use row to change color with a blending fx
 
 ## Ref
 
