@@ -7,6 +7,7 @@ import (
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
 	"github.com/draeron/gopkg/color"
 	"github.com/draeron/gopkg/logger"
+	"time"
 )
 
 var log = logger.New("main")
@@ -27,9 +28,10 @@ func setup() {
 	mask := launchpad.Mask{
 		button.User: true,
 	}
-	gryd := grid.NewGrid(12,12, true, mask)
+	gryd := grid.NewGrid(16,16, true, mask)
 	gryd.Layout.DebugName = "grid"
 
+	gryd.Layout.SetHoldTimer(launchpad.ArrowHold, time.Millisecond * 20)
 	gryd.SetHandler(func(grd *grid.Grid, x, y int, event grid.EventType) {
 		if event != grid.Pressed {
 			return

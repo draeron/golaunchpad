@@ -10,17 +10,17 @@ type SevenColor struct {
 func FromColor(color color.Color) SevenColor {
 	r,g,b,_ := color.RGBA()
 	return SevenColor{
-		R: uint8(r >> 10),
-		G: uint8(g >> 10),
-		B: uint8(b >> 10),
+		R: uint8(r >> 9),
+		G: uint8(g >> 9),
+		B: uint8(b >> 9),
 	}
 }
 
 /*
 	Convert 7 to 16 bits channels
 */
-func (bc SevenColor) RGBA() (r, g, b, a uint32) {
-	return r << 9, r << 9, r << 9, 0xffff
+func (bc SevenColor) RGBA() (uint32, uint32, uint32, uint32) {
+	return uint32(bc.R) << 9, uint32(bc.G) << 9, uint32(bc.B) << 9, 0xffff
 }
 
 func (bc SevenColor) IsSame(other SevenColor) bool {

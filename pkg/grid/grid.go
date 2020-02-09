@@ -5,7 +5,6 @@ import (
 	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
 	"image/color"
-	"math"
 	"time"
 )
 
@@ -190,7 +189,7 @@ func (g *Grid) updateColors() {
 			if canMove() {
 				mapp[btn] = seven_bits.FromColor(color.White)
 			} else {
-				mapp[btn] = seven_bits.FromColor(color.RGBA{R:math.MaxInt8})
+				mapp[btn] = seven_bits.FromColor(color.RGBA{R:255})
 			}
 		}
 	}

@@ -31,11 +31,11 @@ func (bm ButtonStateMap) HoldTime(btn button.Button) time.Duration {
 	return 0
 }
 
-func (bm *ButtonStateMap) IsPressed(btn button.Button) bool {
+func (bm ButtonStateMap) IsPressed(btn button.Button) bool {
 	return bm.HoldTime(btn) > 0
 }
 
-func (bm *ButtonStateMap) IsHold(btn button.Button, threshold time.Duration) bool {
+func (bm ButtonStateMap) IsHold(btn button.Button, threshold time.Duration) bool {
 	return bm.HoldTime(btn) > threshold
 }
 
