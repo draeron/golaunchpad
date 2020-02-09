@@ -52,7 +52,8 @@ contains basic setup and are use as integration tests.
 
 ### Other
 
-- [ ] support on darwin, linux, rpi
+- [x] linux / raspian
+- [ ] darwin
 
 ## Examples
 

@@ -7,7 +7,6 @@ import (
 	"github.com/draeron/golaunchpad/pkg/launchpad/event"
 	"github.com/draeron/golaunchpad/pkg/minimk3/cmd"
 	"image/color"
-	"regexp"
 	"sync"
 )
 
@@ -19,11 +18,6 @@ type Controller struct {
 	mutex       sync.RWMutex
 }
 
-var (
-	rxDAW     = regexp.MustCompile(`LPMiniMK3 MIDI ([[:digit:]])+$`)
-	rxMidiIn  = regexp.MustCompile(`MIDIIN([0-9]+) \(LPMiniMK3 MIDI\)`)
-	rxMidiOut = regexp.MustCompile(`MIDIOUT([0-9]+) \(LPMiniMK3 MIDI\)`)
-)
 
 const (
 	Default = Mode(iota)

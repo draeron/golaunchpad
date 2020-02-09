@@ -39,7 +39,7 @@ func setup() {
 		common.Must(layout.SetColor(b, color.PaletteColor(i)))
 	}
 
-	const blendtime = time.Millisecond * 250
+	const blendtime = time.Millisecond * 400
 
 	layout.SetHandler(launchpad.RowPressed, func(layout *launchpad.BasicLayout, btn button.Button) {
 		col := color.PaletteColor(btn - button.Row1)
@@ -56,7 +56,7 @@ func setup() {
 		col := color.PaletteColor(btn - button.Row1)
 		for _, btn := range button.Pads() {
 			old := layout.Color(btn)
-			blend := dcolor.Blend(old, col, time.Millisecond * 30)
+			blend := dcolor.Blend(old, col, time.Millisecond * 100)
 			common.Must(layout.SetColor(btn, blend))
 		}
 	})

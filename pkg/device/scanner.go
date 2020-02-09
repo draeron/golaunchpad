@@ -19,6 +19,7 @@ func Detect(rxDaw, midiInRx, midiOutRx *regexp.Regexp) (*MiniMk3, error) {
 	}
 
 	for _, in := range ins {
+		//println("in:", in.String())
 		if rxDaw.MatchString(in.String()) {
 			pad.dawIn = in
 		} else if midiInRx.MatchString(in.String()) {
@@ -32,6 +33,7 @@ func Detect(rxDaw, midiInRx, midiOutRx *regexp.Regexp) (*MiniMk3, error) {
 	}
 
 	for _, out := range outs {
+		//println("out:", out.String())
 		if rxDaw.MatchString(out.String()) {
 			pad.dawOut = out
 		} else if midiOutRx.MatchString(out.String()) {

@@ -1,6 +1,7 @@
 package grid
 
 import (
+	seven_bits "github.com/draeron/golaunchpad/pkg/colors/7bits"
 	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
 	"image/color"
@@ -187,9 +188,9 @@ func (g *Grid) updateColors() {
 		}
 		if canMove != nil {
 			if canMove() {
-				mapp[btn] = color.White
+				mapp[btn] = seven_bits.FromColor(color.White)
 			} else {
-				mapp[btn] = color.RGBA{R:math.MaxInt8}
+				mapp[btn] = seven_bits.FromColor(color.RGBA{R:math.MaxInt8})
 			}
 		}
 	}
@@ -198,7 +199,7 @@ func (g *Grid) updateColors() {
 		for y := 0; y < 8; y++ {
 			btn := button.FromPadXY(x, y)
 			cx, cy := g.wrapPos(x + g.posX, y + g.posY)
-			mapp[btn] = g.Color(cx,cy)
+			mapp[btn] = seven_bits.FromColor(g.Color(cx,cy))
 		}
 	}
 	g.Layout.SetColors(mapp)

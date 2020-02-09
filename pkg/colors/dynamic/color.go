@@ -54,6 +54,12 @@ func Blend(old color.Color, target color.Color, duration time.Duration) *Dynamic
 
 			count ++
 		}
+
+		toupdate.mutex.Lock()
+		for idx := range _target {
+			toupdate.current[idx] = _target[idx]
+		}
+		toupdate.mutex.Unlock()
 	}(dyn)
 
 	return dyn
