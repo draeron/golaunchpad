@@ -4,8 +4,8 @@ import (
 	"github.com/draeron/golaunchpad/examples/common"
 	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
-	"github.com/draeron/gopkg/color"
-	"github.com/draeron/gopkg/logger"
+	"github.com/draeron/gopkgs/color"
+	"github.com/draeron/gopkgs/logger"
 )
 
 var log = logger.New("main")

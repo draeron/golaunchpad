@@ -7,7 +7,7 @@ import (
 	"github.com/draeron/golaunchpad/pkg/device"
 	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/minimk3"
-	"github.com/draeron/gopkg/logger"
+	"github.com/draeron/gopkgs/logger"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -15,7 +15,7 @@ import (
 	"runtime/pprof"
 	"time"
 
-	"github.com/draeron/gopkg/color"
+	"github.com/draeron/gopkgs/color"
 )
 
 func WaitExit() {

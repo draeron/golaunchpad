@@ -1,7 +1,7 @@
 package dynamic
 
 import (
-	inner "github.com/draeron/gopkg/color"
+	inner "github.com/draeron/gopkgs/color"
 	"image/color"
 	"sync"
 	"time"

@@ -18,6 +18,8 @@ github.com/docker/go-connections v0.4.0/go.mod h1:Gbd7IOopHjR8Iph03tsViu4nIes5Xh
 github.com/docker/go-units v0.3.3/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
 github.com/draeron/gopkg v0.1.1 h1:me8OgE+7PSdddRgAtlVxoBH+i1ZzCJSJvRcH1ElCrd0=
 github.com/draeron/gopkg v0.1.1/go.mod h1:xlkBkwAWfvexbB0muvXi1N9NrJjfHMa6sS/UvxvrGOQ=
+github.com/draeron/gopkgs v0.1.2 h1:ZiIeVfvxxU14iZ/F6N23cfWssM2foxcwiDEIvuuQtSI=
+github.com/draeron/gopkgs v0.1.2/go.mod h1:ljwRRmzZHIY/j/16PkNrfjzvChVXhYLUGu+gxmr93ak=
 github.com/fogleman/gg v1.2.1-0.20190220221249-0403632d5b90/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
 github.com/fogleman/gg v1.3.0/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
 github.com/go-gl/gl v0.0.0-20181026044259-55b76b7df9d2/go.mod h1:482civXOzJJCPzJ4ZOX/pwvXBWSnzD4OKMdH4ClKGbk=
