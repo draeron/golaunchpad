@@ -8,7 +8,7 @@ type SevenColor struct {
 }
 
 func FromColor(color color.Color) SevenColor {
-	r,g,b,_ := color.RGBA()
+	r, g, b, _ := color.RGBA()
 	return SevenColor{
 		R: uint8(r >> 9),
 		G: uint8(g >> 9),

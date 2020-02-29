@@ -56,7 +56,7 @@ func setup() {
 		col := color.PaletteColor(btn - button.Row1)
 		for _, btn := range button.Pads() {
 			old := layout.Color(btn)
-			blend := dcolor.Blend(old, col, time.Millisecond * 100)
+			blend := dcolor.Blend(old, col, time.Millisecond*100)
 			common.Must(layout.SetColor(btn, blend))
 		}
 	})

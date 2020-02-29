@@ -16,7 +16,8 @@ type ButtonStateMap map[button.Button]*ButtonState
 func (bm ButtonStateMap) Press(btn button.Button) {
 	if b, ok := bm[btn]; ok {
 		b.pressTime = time.Now()
-	}}
+	}
+}
 
 func (bm ButtonStateMap) Release(btn button.Button) {
 	if b, ok := bm[btn]; ok {
@@ -40,7 +41,7 @@ func (bm ButtonStateMap) IsHold(btn button.Button, threshold time.Duration) bool
 }
 
 func (bm ButtonStateMap) SetColor(btn button.Button, col color.Color) {
-	val := ButtonState{ Color: col }
+	val := ButtonState{Color: col}
 	if b, ok := bm[btn]; ok {
 		val.pressTime = b.pressTime
 	}

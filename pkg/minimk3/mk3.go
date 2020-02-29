@@ -18,7 +18,6 @@ type Controller struct {
 	mutex       sync.RWMutex
 }
 
-
 const (
 	Default = Mode(iota)
 	DawMode

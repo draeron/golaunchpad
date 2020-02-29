@@ -23,6 +23,7 @@ type Grid struct {
 	colors       [][]color.Color
 	wrap         bool
 	handler      Handler
+	arrows       bool
 }
 
 const (
@@ -31,7 +32,7 @@ const (
 )
 
 type EventType int
-type Handler func(grid *Grid, x,y int, event EventType)
+type Handler func(grid *Grid, x, y int, event EventType)
 
 func NewGrid(x, y int, arrows bool, mask launchpad.Mask) *Grid {
 	mask = launchpad.MaskPad.Mask().Merge(mask)
@@ -44,6 +45,7 @@ func NewGrid(x, y int, arrows bool, mask launchpad.Mask) *Grid {
 		Layout: launchpad.NewLayout(mask),
 		sizeX:  x,
 		sizeY:  y,
+		arrows: arrows,
 	}
 
 	for i, _ := range grid.colors {
@@ -54,7 +56,7 @@ func NewGrid(x, y int, arrows bool, mask launchpad.Mask) *Grid {
 	if arrows {
 		grid.Layout.SetHandler(launchpad.ArrowPressed, grid.onArrow)
 		grid.Layout.SetHandler(launchpad.ArrowHold, grid.onArrow)
-		grid.Layout.SetHoldTimer(launchpad.ArrowHold, time.Millisecond * 75)
+		grid.Layout.SetHoldTimer(launchpad.ArrowHold, time.Millisecond*75)
 	}
 
 	grid.Layout.SetHandler(launchpad.PadPressed, func(layout *launchpad.BasicLayout, btn button.Button) {
@@ -79,7 +81,7 @@ func (g *Grid) onPad(btn button.Button, eventType EventType) {
 		x, y := btn.Coord()
 		y-- // pads are y+1
 
-		x, y = g.wrapPos(x + g.posX, y + g.posY)
+		x, y = g.wrapPos(x+g.posX, y+g.posY)
 		g.handler(g, x, y, eventType)
 	}
 }
@@ -87,7 +89,7 @@ func (g *Grid) onPad(btn button.Button, eventType EventType) {
 func (g *Grid) PanUp() bool {
 	oldY := g.posY
 	if g.CanPanUp() {
-		g.posY = (g.posY - 1)  % g.sizeY
+		g.posY = (g.posY - 1) % g.sizeY
 	}
 	return oldY != g.posY
 }
@@ -121,7 +123,7 @@ func (g *Grid) CanPanUp() bool {
 }
 
 func (g *Grid) CanPanDown() bool {
-	return g.wrap || g.posY < g.sizeY - 8
+	return g.wrap || g.posY < g.sizeY-8
 }
 
 func (g *Grid) CanPanLeft() bool {
@@ -129,7 +131,7 @@ func (g *Grid) CanPanLeft() bool {
 }
 
 func (g *Grid) CanPanRight() bool {
-	return g.wrap || g.posX < g.sizeX - 8
+	return g.wrap || g.posX < g.sizeX-8
 }
 
 func (g *Grid) onArrow(layout *launchpad.BasicLayout, btn button.Button) {
@@ -148,7 +150,7 @@ func (g *Grid) onArrow(layout *launchpad.BasicLayout, btn button.Button) {
 }
 
 func (g *Grid) Color(x, y int) color.Color {
-	if 	x < 0 || y < 0 || x >= g.sizeX || y >= g.sizeY {
+	if x < 0 || y < 0 || x >= g.sizeX || y >= g.sizeY {
 		return color.Black
 	}
 	return g.colors[x][y]
@@ -173,23 +175,25 @@ func (g *Grid) SetColor(x, y int, col color.Color) {
 func (g *Grid) updateColors() {
 	mapp := button.ColorMap{}
 
-	for _, btn := range button.Arrows() {
-		var canMove func() bool
-		switch btn {
-		case button.Up:
-			canMove = g.CanPanUp
-		case button.Down:
-			canMove = g.CanPanDown
-		case button.Left:
-			canMove = g.CanPanLeft
-		case button.Right:
-			canMove = g.CanPanRight
-		}
-		if canMove != nil {
-			if canMove() {
-				mapp[btn] = seven_bits.FromColor(color.White)
-			} else {
-				mapp[btn] = seven_bits.FromColor(color.RGBA{R:255})
+	if g.arrows {
+		for _, btn := range button.Arrows() {
+			var canMove func() bool
+			switch btn {
+			case button.Up:
+				canMove = g.CanPanUp
+			case button.Down:
+				canMove = g.CanPanDown
+			case button.Left:
+				canMove = g.CanPanLeft
+			case button.Right:
+				canMove = g.CanPanRight
+			}
+			if canMove != nil {
+				if canMove() {
+					mapp[btn] = seven_bits.FromColor(color.White)
+				} else {
+					mapp[btn] = seven_bits.FromColor(color.RGBA{R: 255})
+				}
 			}
 		}
 	}
@@ -197,8 +201,8 @@ func (g *Grid) updateColors() {
 	for x := 0; x < 8; x++ {
 		for y := 0; y < 8; y++ {
 			btn := button.FromPadXY(x, y)
-			cx, cy := g.wrapPos(x + g.posX, y + g.posY)
-			mapp[btn] = seven_bits.FromColor(g.Color(cx,cy))
+			cx, cy := g.wrapPos(x+g.posX, y+g.posY)
+			mapp[btn] = seven_bits.FromColor(g.Color(cx, cy))
 		}
 	}
 	g.Layout.SetColors(mapp)
@@ -224,14 +228,14 @@ func (g *Grid) Wrap(b bool) {
 	g.wrap = b
 
 	if !g.wrap { // convert back to a valid coordinate
-		g.posX = clamp(g.posX, 0, g.sizeX - 8)
-		g.posY = clamp(g.posY, 0, g.sizeY - 8)
+		g.posX = clamp(g.posX, 0, g.sizeX-8)
+		g.posY = clamp(g.posY, 0, g.sizeY-8)
 	}
 
 	g.updateColors()
 }
 
-func (g *Grid) wrapPos(x,y int) (int, int) {
+func (g *Grid) wrapPos(x, y int) (int, int) {
 	if g.wrap {
 		if x < 0 || x >= g.sizeX {
 			x = (x + g.sizeX) % g.sizeX

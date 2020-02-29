@@ -14,7 +14,7 @@ var device launchpad.Controller
 var top *launchpad.BasicLayout
 var pads [4]*launchpad.BasicLayout
 var currentMode = 0
-var modeColors = []color.Color{ color.Red, color.Blue, color.Green, color.Yellow }
+var modeColors = []color.Color{color.Red, color.Blue, color.Green, color.Yellow}
 
 func main() {
 	log.Info("starting layout example")

@@ -13,7 +13,7 @@ type DynamicColor struct {
 	mutex   sync.Mutex
 }
 
-func (c *DynamicColor) RGBA() (r,g,b,A uint32) {
+func (c *DynamicColor) RGBA() (r, g, b, A uint32) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	return uint32(c.current[0]), uint32(c.current[1]), uint32(c.current[2]), uint32(c.current[3])
@@ -50,9 +50,9 @@ func Blend(old color.Color, target color.Color, duration time.Duration) *Dynamic
 			}
 			toupdate.mutex.Unlock()
 
-			<- tick.C
+			<-tick.C
 
-			count ++
+			count++
 		}
 
 		toupdate.mutex.Lock()
@@ -89,6 +89,6 @@ func fromSlice(rgba [4]int) inner.Color {
 }
 
 func toSlice(rgba color.Color) [4]int {
-	r,g,b,a := rgba.RGBA()
-	return [4]int{int(r),int(g),int(b),int(a)}
+	r, g, b, a := rgba.RGBA()
+	return [4]int{int(r), int(g), int(b), int(a)}
 }

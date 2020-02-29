@@ -28,19 +28,19 @@ func setup() {
 	mask := launchpad.Mask{
 		button.User: true,
 	}
-	gryd := grid.NewGrid(16,16, true, mask)
+	gryd := grid.NewGrid(16, 16, true, mask)
 	gryd.Layout.DebugName = "grid"
 
-	gryd.Layout.SetHoldTimer(launchpad.ArrowHold, time.Millisecond * 20)
+	gryd.Layout.SetHoldTimer(launchpad.ArrowHold, time.Millisecond*20)
 	gryd.SetHandler(func(grd *grid.Grid, x, y int, event grid.EventType) {
 		if event != grid.Pressed {
 			return
 		}
-		col := color.FromColor(gryd.Color(x,y))
+		col := color.FromColor(gryd.Color(x, y))
 		if col.Equal(color.Black) {
-			gryd.SetColor(x,y, common.RandColor())
+			gryd.SetColor(x, y, common.RandColor())
 		} else {
-			gryd.SetColor(x,y, color.Black)
+			gryd.SetColor(x, y, color.Black)
 		}
 	})
 

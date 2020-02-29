@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/draeron/golaunchpad/pkg/launchpad/event"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
+	"github.com/draeron/golaunchpad/pkg/launchpad/event"
 	"go.uber.org/atomic"
 )
 
@@ -35,7 +35,7 @@ type BasicLayout struct {
 
 type handlersMap map[HandlerType]HoldHandler
 
-const defaultHoldDuration = time.Millisecond * 250
+const DefaultHoldDuration = time.Millisecond * 250
 
 func NewLayoutPreset(preset MaskPreset) *BasicLayout {
 	return NewLayout(preset.Mask())
@@ -43,12 +43,12 @@ func NewLayoutPreset(preset MaskPreset) *BasicLayout {
 
 func NewLayout(mask Mask) *BasicLayout {
 	l := &BasicLayout{
-		state:      ButtonStateMap{},
-		lastColors: button.ColorMap{},
-		handlers:   handlersMap{},
-		mask:       mask,
-		holdTimerDefault: defaultHoldDuration,
-		holdTimer:  map[HandlerType]time.Duration{},
+		state:            ButtonStateMap{},
+		lastColors:       button.ColorMap{},
+		handlers:         handlersMap{},
+		mask:             mask,
+		holdTimerDefault: DefaultHoldDuration,
+		holdTimer:        map[HandlerType]time.Duration{},
 	}
 	l.state.SetColors(mask, color.Black) // allocated state
 	return l
@@ -104,7 +104,7 @@ func (l *BasicLayout) Deactivate() {
 
 /*
 	The handler will be
- */
+*/
 func (l *BasicLayout) SetHandler(htype HandlerType, handler Handler) {
 	l.handlers[htype] = func(layout *BasicLayout, btn button.Button, first bool) {
 		if first {
@@ -272,8 +272,6 @@ func (l *BasicLayout) dispatch(e event.Event) {
 	l.mutex.Lock()
 	if e.Type == event.Pressed {
 		l.state.Press(e.Btn)
-	} else {
-		l.state.Release(e.Btn)
 	}
 	l.mutex.Unlock()
 
@@ -284,12 +282,14 @@ func (l *BasicLayout) dispatch(e event.Event) {
 				timer = t
 			}
 			go func() {
-				first := false
+				first := true
 				for {
-					<- time.After(timer)
+					<-time.After(timer)
 					if l.state.IsHold(e.Btn, timer) {
 						handle(l, e.Btn, first)
-						first = !first
+						if first {
+							first = false
+						}
 					} else {
 						return
 					}
@@ -301,4 +301,10 @@ func (l *BasicLayout) dispatch(e event.Event) {
 	if h, ok := l.handlers[ht]; ok {
 		h(l, e.Btn, true)
 	}
+
+	l.mutex.Lock()
+	if e.Type == event.Released {
+		l.state.Release(e.Btn)
+	}
+	l.mutex.Unlock()
 }

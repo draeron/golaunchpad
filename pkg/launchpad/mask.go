@@ -15,7 +15,7 @@ import (
 	MaskTop
 	MaskAll
 )
- */
+*/
 type MaskPreset int
 
 type Mask map[button.Button]bool
@@ -35,7 +35,7 @@ func (m Mask) Intersect(mapp ButtonStateMap) button.ColorMap {
 	return out
 }
 
-func (m Mask) MergePreset(masks... MaskPreset) Mask {
+func (m Mask) MergePreset(masks ...MaskPreset) Mask {
 	out := m
 	for _, mask := range masks {
 		out.Merge(mask.Mask())
@@ -43,7 +43,7 @@ func (m Mask) MergePreset(masks... MaskPreset) Mask {
 	return out
 }
 
-func (m Mask) Merge(masks... Mask) Mask {
+func (m Mask) Merge(masks ...Mask) Mask {
 	out := m
 	for _, mask := range masks {
 		for b, v := range mask {
