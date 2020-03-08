@@ -43,7 +43,7 @@ func NewLayoutPreset(preset MaskPreset) *BasicLayout {
 
 func NewLayout(mask Mask) *BasicLayout {
 	l := &BasicLayout{
-		state:            ButtonStateMap{},
+		state:            NewButtonStateMap(),
 		lastColors:       button.ColorMap{},
 		handlers:         handlersMap{},
 		mask:             mask,
@@ -165,31 +165,18 @@ func (l *BasicLayout) Color(btn button.Button) color.Color {
 }
 
 func (l *BasicLayout) SetColorAll(col color.Color) error {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
-
-	for b, _ := range l.state {
-		l.state.SetColor(b, col)
-	}
-
+	l.state.SetAllColors(col)
 	return nil
 }
 
 func (l *BasicLayout) SetColorMask(mask MaskPreset, col color.Color) error {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
-
 	for b, _ := range mask.Mask() {
 		l.state.SetColor(b, col)
 	}
-
 	return nil
 }
 
 func (l *BasicLayout) SetColorMany(btns []button.Button, color color.Color) error {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
-
 	for _, k := range btns {
 		l.state.SetColor(k, color)
 	}
@@ -197,17 +184,11 @@ func (l *BasicLayout) SetColorMany(btns []button.Button, color color.Color) erro
 }
 
 func (l *BasicLayout) SetColor(btn button.Button, color color.Color) error {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
-
 	l.state.SetColor(btn, color)
 	return nil
 }
 
 func (l *BasicLayout) SetColors(set button.ColorMap) error {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
-
 	l.state.SetColorsMap(set)
 	return nil
 }

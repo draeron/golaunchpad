@@ -27,7 +27,7 @@ func (m Mask) Intersect(mapp ButtonStateMap) button.ColorMap {
 	out := make(button.ColorMap)
 	for k, v := range m {
 		if v {
-			if cl, ok := mapp[k]; ok {
+			if cl := mapp.Get(k); cl != nil {
 				out[k] = seven_bits.FromColor(cl.Color)
 			}
 		}
