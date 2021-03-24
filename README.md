@@ -59,7 +59,7 @@ contains basic setup and are use as integration tests.
 
 - [wave](examples/wave/wave.go): colored wave upon pressing a pad button
 - [scan](examples/scan/scan.go): light up every button one after the other
-- [text](examples/scan/text.go): display pressed coordinate as text
+- [text](examples/text/text.go): display pressed coordinate as text
 - [layout](examples/layout/layout.go): press pad to light up buttons, use top button to select pages
 - [grid](examples/grid/grid.go): use arrow to scroll through a grid, _user_ button toggle wrapping mode
 - [blend](examples/blend/blend.go): use row to change color with a blending fx
