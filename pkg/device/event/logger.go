@@ -1,6 +1,8 @@
 package event
 
-import "github.com/draeron/golaunchpad/pkg/logger"
+import (
+	"github.com/draeron/gopkgs/logger"
+)
 
 var log logger.Logger = logger.Dummy{}
 

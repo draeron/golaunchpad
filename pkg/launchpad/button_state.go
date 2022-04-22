@@ -13,13 +13,13 @@ type ButtonState struct {
 }
 
 type ButtonStateMap struct {
-	data map[button.Button]*ButtonState
+	data  map[button.Button]*ButtonState
 	mutex *sync.RWMutex
 }
 
 func NewButtonStateMap() ButtonStateMap {
 	return ButtonStateMap{
-		data: map[button.Button]*ButtonState{},
+		data:  map[button.Button]*ButtonState{},
 		mutex: &sync.RWMutex{},
 	}
 }

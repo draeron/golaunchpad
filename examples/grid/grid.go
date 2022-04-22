@@ -1,16 +1,17 @@
 package main
 
 import (
+	"time"
+
 	"github.com/draeron/golaunchpad/examples/common"
 	"github.com/draeron/golaunchpad/pkg/grid"
 	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
 	"github.com/draeron/gopkgs/color"
 	"github.com/draeron/gopkgs/logger"
-	"time"
 )
 
-var log = logger.New("main")
+var log = logger.NewLogrus("main")
 var device launchpad.Controller
 
 func main() {

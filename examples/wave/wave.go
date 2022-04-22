@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"time"
+
+	"github.com/draeron/golaunchpad/pkg/launchpad"
 
 	"github.com/draeron/golaunchpad/examples/common"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
@@ -11,7 +12,7 @@ import (
 	"github.com/draeron/gopkgs/logger"
 )
 
-var log = logger.New("main")
+var log = logger.NewLogrus("main")
 var pad launchpad.Controller
 
 func main() {
@@ -37,11 +38,11 @@ func setup() {
 				if e.Type == event.Pressed {
 					col := common.RandColor()
 					err := pad.SetColor(e.Btn, col)
-					log.LogIfErr(err)
+					log.ErrorIf(err, "")
 					go wavefx(e.Btn, col)
 				} else if e.Type == event.Released {
 					err := pad.SetColor(e.Btn, color.Black)
-					log.LogIfErr(err)
+					log.ErrorIf(err, "")
 				}
 			}
 		}

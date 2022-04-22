@@ -3,19 +3,16 @@ package common
 import (
 	"context"
 	"fmt"
+	"math/rand"
+	"os"
+	"os/signal"
+
 	"github.com/TheCodeTeam/goodbye"
 	"github.com/draeron/golaunchpad/pkg/device"
 	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/minimk3"
-	"github.com/draeron/gopkgs/logger"
-	"math/rand"
-	"os"
-	"os/signal"
-	"runtime"
-	"runtime/pprof"
-	"time"
-
 	"github.com/draeron/gopkgs/color"
+	"github.com/draeron/gopkgs/logger"
 )
 
 func WaitExit() {
@@ -24,7 +21,7 @@ func WaitExit() {
 
 	ctx := context.Background()
 	goodbye.Notify(ctx)
-	defer goodbye.Exit(ctx, -1)
+	// defer goodbye.Exit(ctx, -1)
 
 	signal.Notify(sigs)
 	go func() {
@@ -50,46 +47,18 @@ func RandColor() color.RGB {
 	return col
 }
 
-func StartProfiling() {
-	log := logger.New("profiler")
-
-	log.Infof("enabling profiling")
-
-	f, err := os.Create("profile.pprof")
-	Must(err)
-	err = pprof.StartCPUProfile(f)
-	Must(err)
-
-	goodbye.Register(func(ctx context.Context, s os.Signal) {
-		pprof.StopCPUProfile()
-	})
-
-	go func() {
-		tick := time.NewTicker(time.Second * 5)
-
-		goodbye.Register(func(ctx context.Context, s os.Signal) {
-			tick.Stop()
-		})
-
-		for range tick.C {
-			stats := runtime.MemStats{}
-			runtime.ReadMemStats(&stats)
-			log.Debugf("goroutine count: %d, memory: %d kB", runtime.NumGoroutine(), stats.Alloc/1024)
-		}
-	}()
-}
-
 func Setup() launchpad.Controller {
-	device.SetLogger(logger.New("device"))
-	minimk3.SetLogger(logger.New("minimk3"))
+	color.SetLogger(logger.NewLogrus("color"))
+	device.SetLogger(logger.NewLogrus("device"))
+	minimk3.SetLogger(logger.NewLogrus("minimk3"))
 
-	//StartProfiling()
+	// StartProfiling()
 
 	pad, err := minimk3.Open(minimk3.ProgrammerMode)
 	Must(err)
 	Must(pad.Diag())
 
-	//pad.EnableDebugLogger()
+	// pad.EnableDebugLogger()
 
 	return pad
 }

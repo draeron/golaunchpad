@@ -1,8 +1,9 @@
 package main
 
 import (
-	dcolor "github.com/draeron/golaunchpad/pkg/colors/dynamic"
 	"time"
+
+	dcolor "github.com/draeron/golaunchpad/pkg/colors/dynamic"
 
 	"github.com/draeron/golaunchpad/examples/common"
 	"github.com/draeron/golaunchpad/pkg/launchpad"
@@ -11,7 +12,7 @@ import (
 	"github.com/draeron/gopkgs/logger"
 )
 
-var log = logger.New("main")
+var log = logger.NewLogrus("main")
 var ctrl launchpad.Controller
 
 func main() {

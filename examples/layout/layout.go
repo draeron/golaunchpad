@@ -8,7 +8,7 @@ import (
 	"github.com/draeron/gopkgs/logger"
 )
 
-var log = logger.New("main")
+var log = logger.NewLogrus("main")
 var device launchpad.Controller
 
 var top *launchpad.BasicLayout

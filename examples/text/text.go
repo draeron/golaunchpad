@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/draeron/golaunchpad/examples/common"
 	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
@@ -10,7 +11,7 @@ import (
 	"github.com/draeron/gopkgs/logger"
 )
 
-var log = logger.New("main")
+var log = logger.NewLogrus("main")
 var pad launchpad.Controller
 
 func main() {
