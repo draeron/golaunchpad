@@ -1,11 +1,12 @@
 package grid
 
 import (
+	"image/color"
+	"time"
+
 	seven_bits "github.com/draeron/golaunchpad/pkg/colors/7bits"
 	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
-	"image/color"
-	"time"
 )
 
 /*

@@ -3,8 +3,8 @@ package event
 import (
 	"fmt"
 
-	"github.com/draeron/golaunchpad/pkg/device/event"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
+	"github.com/draeron/gopkgs/midi/event"
 )
 
 type Event struct {

@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"bytes"
-	"gitlab.com/gomidi/midi/midimessage/sysex"
 	"log"
+
+	"gitlab.com/gomidi/midi/v2"
 )
 
 //go:generate go-enum -f=$GOFILE --noprefix
@@ -52,9 +53,9 @@ func (c Cmd) Bytes() []byte {
 	return nil
 }
 
-func (c Cmd) SysEx(byts ...byte) sysex.SysEx {
+func (c Cmd) SysEx(byts ...byte) midi.Message {
 	buf := bytes.Buffer{}
 	buf.Write(c.Bytes())
 	buf.Write(byts)
-	return sysex.SysEx(buf.Bytes())
+	return midi.SysEx(buf.Bytes())
 }

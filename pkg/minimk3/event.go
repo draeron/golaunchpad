@@ -1,8 +1,8 @@
 package minimk3
 
 import (
-	dev "github.com/draeron/golaunchpad/pkg/device/event"
 	"github.com/draeron/golaunchpad/pkg/launchpad/event"
+	dev "github.com/draeron/gopkgs/midi/event"
 )
 
 func (m *Controller) Subscribe(channel chan<- event.Event) {

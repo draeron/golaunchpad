@@ -5,9 +5,10 @@ import (
 	"sync"
 	"time"
 
+	"go.uber.org/atomic"
+
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
 	"github.com/draeron/golaunchpad/pkg/launchpad/event"
-	"go.uber.org/atomic"
 )
 
 type Layout interface {

@@ -8,11 +8,12 @@ import (
 	"os/signal"
 
 	"github.com/TheCodeTeam/goodbye"
-	"github.com/draeron/golaunchpad/pkg/device"
+
 	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/minimk3"
 	"github.com/draeron/gopkgs/color"
 	"github.com/draeron/gopkgs/logger"
+	"github.com/draeron/gopkgs/midi"
 )
 
 func WaitExit() {
@@ -35,7 +36,7 @@ func WaitExit() {
 
 func Must(err error) {
 	if err != nil {
-		panic(err.Error())
+		panic(fmt.Sprintf("%+v", err))
 	}
 }
 
@@ -49,7 +50,7 @@ func RandColor() color.RGB {
 
 func Setup() launchpad.Controller {
 	color.SetLogger(logger.NewLogrus("color"))
-	device.SetLogger(logger.NewLogrus("device"))
+	midi.SetLogger(logger.NewLogrus("midi"))
 	minimk3.SetLogger(logger.NewLogrus("minimk3"))
 
 	// StartProfiling()

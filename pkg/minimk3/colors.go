@@ -1,12 +1,14 @@
 package minimk3
 
 import (
-	seven_bits "github.com/draeron/golaunchpad/pkg/colors/7bits"
 	"image/color"
+
+	seven_bits "github.com/draeron/golaunchpad/pkg/colors/7bits"
+
+	"go.uber.org/zap/buffer"
 
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
 	"github.com/draeron/golaunchpad/pkg/minimk3/cmd"
-	"go.uber.org/zap/buffer"
 )
 
 const (
