@@ -1,8 +1,8 @@
 package launchpad
 
 import (
-	seven_bits "github.com/draeron/golaunchpad/pkg/colors/7bits"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
+	"github.com/draeron/gopkgs/color/7bits"
 )
 
 //go:generate go-enum -f=$GOFILE --noprefix

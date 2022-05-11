@@ -4,6 +4,7 @@ import (
 	"github.com/draeron/golaunchpad/examples/common"
 	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
+	"github.com/draeron/golaunchpad/pkg/layout"
 	"github.com/draeron/gopkgs/color"
 	"github.com/draeron/gopkgs/logger"
 )
@@ -11,8 +12,8 @@ import (
 var log = logger.NewLogrus("main")
 var device launchpad.Controller
 
-var top *launchpad.BasicLayout
-var pads [4]*launchpad.BasicLayout
+var top *layout.BasicLayout
+var pads [4]*layout.BasicLayout
 var currentMode = 0
 var modeColors = []color.Color{color.Red, color.Blue, color.Green, color.Yellow}
 
@@ -28,9 +29,9 @@ func main() {
 }
 
 func setup() {
-	top = launchpad.NewLayoutPreset(launchpad.MaskTop)
+	top = layout.NewLayoutPreset(launchpad.MaskTop)
 	top.DebugName = "top"
-	top.SetHandler(launchpad.ModePressed, func(layout *launchpad.BasicLayout, btn button.Button) {
+	top.SetHandler(layout.ModePressed, func(layout *layout.BasicLayout, btn button.Button) {
 		pads[currentMode].Deactivate()
 		currentMode = int(btn - button.Session)
 		pads[currentMode].Activate()
@@ -42,11 +43,11 @@ func setup() {
 		id := button.Session + button.Button(i)
 		top.SetColor(id, modeColors[i])
 
-		pads[i] = launchpad.NewLayoutPreset(launchpad.MaskPad)
+		pads[i] = layout.NewLayoutPreset(launchpad.MaskPad)
 		pads[i].DebugName = id.String()
 		pads[i].Connect(device)
-		pads[i].SetHandler(launchpad.PadPressed, func(layout *launchpad.BasicLayout, btn button.Button) {
-			col := color.FromColor(layout.Color(btn))
+		pads[i].SetHandler(layout.PadPressed, func(layout *layout.BasicLayout, btn button.Button) {
+			col := color.FromStdColor(layout.Color(btn))
 			if col.Equal(color.Black) {
 				layout.SetColor(btn, common.RandColor())
 			} else {

@@ -1,9 +1,8 @@
 package minimk3
 
 import (
-	"image/color"
-
-	seven_bits "github.com/draeron/golaunchpad/pkg/colors/7bits"
+	"github.com/draeron/gopkgs/color"
+	"github.com/draeron/gopkgs/color/7bits"
 
 	"go.uber.org/zap/buffer"
 

@@ -7,6 +7,7 @@ import (
 	"github.com/draeron/golaunchpad/pkg/grid"
 	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
+	"github.com/draeron/golaunchpad/pkg/layout"
 	"github.com/draeron/gopkgs/color"
 	"github.com/draeron/gopkgs/logger"
 )
@@ -32,12 +33,12 @@ func setup() {
 	gryd := grid.NewGrid(16, 16, true, mask)
 	gryd.Layout.DebugName = "grid"
 
-	gryd.Layout.SetHoldTimer(launchpad.ArrowHold, time.Millisecond*20)
+	gryd.Layout.SetHoldTimer(layout.ArrowHold, time.Millisecond*20)
 	gryd.SetHandler(func(grd *grid.Grid, x, y int, event grid.EventType) {
 		if event != grid.Pressed {
 			return
 		}
-		col := color.FromColor(gryd.Color(x, y))
+		col := color.FromStdColor(gryd.Color(x, y))
 		if col.Equal(color.Black) {
 			gryd.SetColor(x, y, common.RandColor())
 		} else {
@@ -48,7 +49,7 @@ func setup() {
 	// Add a toggle on the user btn
 	wrapped := false
 	gryd.Layout.SetColor(button.User, color.Yellow)
-	gryd.Layout.SetHandler(launchpad.ModePressed, func(layout *launchpad.BasicLayout, btn button.Button) {
+	gryd.Layout.SetHandler(layout.ModePressed, func(layout *layout.BasicLayout, btn button.Button) {
 		if btn == button.User {
 			wrapped = !wrapped
 			gryd.Wrap(wrapped)

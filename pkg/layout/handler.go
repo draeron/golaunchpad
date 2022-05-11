@@ -1,11 +1,13 @@
-package launchpad
+package layout
 
-import "github.com/draeron/golaunchpad/pkg/launchpad/button"
+import (
+	"github.com/draeron/golaunchpad/pkg/launchpad/button"
+)
 
 //go:generate go-enum -f=$GOFILE --noprefix
 
-type Handler func(layout *BasicLayout, btn button.Button)
-type HoldHandler func(layout *BasicLayout, btn button.Button, first bool)
+type Handler func(layout Layout, btn button.Button)
+type HoldHandler func(layout Layout, btn button.Button, first bool)
 
 /*
 	HandlerType x ENUM(

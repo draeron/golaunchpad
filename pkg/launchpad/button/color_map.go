@@ -1,6 +1,8 @@
 package button
 
-import color "github.com/draeron/golaunchpad/pkg/colors/7bits"
+import (
+	color "github.com/draeron/gopkgs/color/7bits"
+)
 
 type ColorMap map[Button]color.SevenColor
 

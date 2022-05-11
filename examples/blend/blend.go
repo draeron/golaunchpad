@@ -3,7 +3,8 @@ package main
 import (
 	"time"
 
-	dcolor "github.com/draeron/golaunchpad/pkg/colors/dynamic"
+	"github.com/draeron/golaunchpad/pkg/layout"
+	dcolor "github.com/draeron/gopkgs/color/dynamic"
 
 	"github.com/draeron/golaunchpad/examples/common"
 	"github.com/draeron/golaunchpad/pkg/launchpad"
@@ -27,7 +28,7 @@ func main() {
 }
 
 func setup() {
-	layout := launchpad.NewLayoutPreset(launchpad.MaskAll)
+	layout := layout.NewLayoutPreset(launchpad.MaskAll)
 	layout.DebugName = "blend"
 	layout.Connect(ctrl)
 	layout.Activate()
@@ -42,18 +43,18 @@ func setup() {
 
 	const blendtime = time.Millisecond * 400
 
-	layout.SetHandler(launchpad.RowPressed, func(layout *launchpad.BasicLayout, btn button.Button) {
+	layout.SetHandler(layout.RowPressed, func(layout *layout.BasicLayout, btn button.Button) {
 		col := color.PaletteColor(btn - button.Row1)
 		for _, btn := range button.Pads() {
 			old := layout.Color(btn)
-			if color.Black.Equal(color.FromColor(old)) {
+			if color.Black.Equal(color.FromStdColor(old)) {
 				blend := dcolor.Blend(old, col, blendtime)
 				common.Must(layout.SetColor(btn, blend))
 			}
 		}
 	})
 
-	layout.SetHandler(launchpad.RowHold, func(layout *launchpad.BasicLayout, btn button.Button) {
+	layout.SetHandler(layout.RowHold, func(layout *layout.BasicLayout, btn button.Button) {
 		col := color.PaletteColor(btn - button.Row1)
 		for _, btn := range button.Pads() {
 			old := layout.Color(btn)
@@ -63,7 +64,7 @@ func setup() {
 	})
 
 	// stop blending by assigning a color to the button
-	layout.SetHandler(launchpad.PadPressed, func(layout *launchpad.BasicLayout, btn button.Button) {
+	layout.SetHandler(layout.PadPressed, func(layout *layout.BasicLayout, btn button.Button) {
 		layout.SetColor(btn, color.Black)
 	})
 

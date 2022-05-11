@@ -1,10 +1,9 @@
 package launchpad
 
 import (
-	"image/color"
-
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
 	"github.com/draeron/golaunchpad/pkg/launchpad/event"
+	"github.com/draeron/gopkgs/color"
 )
 
 type Controller interface {

@@ -2,7 +2,8 @@ package launchpad
 
 import (
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
-	"image/color"
+	"github.com/draeron/gopkgs/color"
+
 	"sync"
 	"time"
 )

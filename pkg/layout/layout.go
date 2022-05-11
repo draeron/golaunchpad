@@ -1,18 +1,19 @@
-package launchpad
+package layout
 
 import (
-	"image/color"
 	"sync"
 	"time"
 
 	"go.uber.org/atomic"
 
+	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
 	"github.com/draeron/golaunchpad/pkg/launchpad/event"
+	"github.com/draeron/gopkgs/color"
 )
 
 type Layout interface {
-	Connect(controller Controller)
+	Connect(controller launchpad.Controller)
 	Disconnect()
 	Activate()
 	Deactivate()
@@ -20,13 +21,13 @@ type Layout interface {
 
 type BasicLayout struct {
 	DebugName  string
-	state      ButtonStateMap
+	state      launchpad.ButtonStateMap
 	lastColors button.ColorMap
-	controler  Controller
+	controler  launchpad.Controller
 	handlers   handlersMap
 	enabled    atomic.Bool
 	eventsCh   chan (event.Event)
-	mask       Mask
+	mask       launchpad.Mask
 	mutex      sync.RWMutex
 	ticker     *time.Ticker
 
@@ -38,13 +39,13 @@ type handlersMap map[HandlerType]HoldHandler
 
 const DefaultHoldDuration = time.Millisecond * 250
 
-func NewLayoutPreset(preset MaskPreset) *BasicLayout {
+func NewLayoutPreset(preset launchpad.MaskPreset) *BasicLayout {
 	return NewLayout(preset.Mask())
 }
 
-func NewLayout(mask Mask) *BasicLayout {
+func NewLayout(mask launchpad.Mask) *BasicLayout {
 	l := &BasicLayout{
-		state:            NewButtonStateMap(),
+		state:            launchpad.NewButtonStateMap(),
 		lastColors:       button.ColorMap{},
 		handlers:         handlersMap{},
 		mask:             mask,
@@ -55,7 +56,7 @@ func NewLayout(mask Mask) *BasicLayout {
 	return l
 }
 
-func (l *BasicLayout) Connect(controller Controller) {
+func (l *BasicLayout) Connect(controller launchpad.Controller) {
 	l.mutex.Lock()
 	l.controler = controller
 	l.mutex.Unlock()
@@ -107,7 +108,7 @@ func (l *BasicLayout) Deactivate() {
 	The handler will be
 */
 func (l *BasicLayout) SetHandler(htype HandlerType, handler Handler) {
-	l.handlers[htype] = func(layout *BasicLayout, btn button.Button, first bool) {
+	l.handlers[htype] = func(layout Layout, btn button.Button, first bool) {
 		if first {
 			handler(layout, btn)
 		}
@@ -170,7 +171,7 @@ func (l *BasicLayout) SetColorAll(col color.Color) error {
 	return nil
 }
 
-func (l *BasicLayout) SetColorMask(mask MaskPreset, col color.Color) error {
+func (l *BasicLayout) SetColorMask(mask launchpad.MaskPreset, col color.Color) error {
 	for b, _ := range mask.Mask() {
 		l.state.SetColor(b, col)
 	}

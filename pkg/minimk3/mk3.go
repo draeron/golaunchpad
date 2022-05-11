@@ -1,14 +1,14 @@
 package minimk3
 
 import (
-	"image/color"
 	"sync"
 
 	"github.com/pkg/errors"
 
-	seven_bits "github.com/draeron/golaunchpad/pkg/colors/7bits"
 	"github.com/draeron/golaunchpad/pkg/launchpad/event"
 	"github.com/draeron/golaunchpad/pkg/minimk3/cmd"
+	"github.com/draeron/gopkgs/color"
+	"github.com/draeron/gopkgs/color/7bits"
 	"github.com/draeron/gopkgs/midi"
 	midiEvt "github.com/draeron/gopkgs/midi/event"
 )

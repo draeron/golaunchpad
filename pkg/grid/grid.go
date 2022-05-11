@@ -1,12 +1,13 @@
 package grid
 
 import (
-	"image/color"
 	"time"
 
-	seven_bits "github.com/draeron/golaunchpad/pkg/colors/7bits"
 	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
+	"github.com/draeron/golaunchpad/pkg/layout"
+	"github.com/draeron/gopkgs/color"
+	"github.com/draeron/gopkgs/color/7bits"
 )
 
 /*
@@ -18,7 +19,7 @@ import (
 	the speed which those arrow scroll the colors
 */
 type Grid struct {
-	Layout       *launchpad.BasicLayout
+	Layout       *layout.BasicLayout
 	posX, posY   int
 	sizeX, sizeY int
 	colors       [][]color.Color
@@ -43,7 +44,7 @@ func NewGrid(x, y int, arrows bool, mask launchpad.Mask) *Grid {
 
 	grid := Grid{
 		colors: make([][]color.Color, x),
-		Layout: launchpad.NewLayout(mask),
+		Layout: layout.NewLayout(mask),
 		sizeX:  x,
 		sizeY:  y,
 		arrows: arrows,
@@ -55,15 +56,15 @@ func NewGrid(x, y int, arrows bool, mask launchpad.Mask) *Grid {
 	grid.SetColorAll(color.Black)
 
 	if arrows {
-		grid.Layout.SetHandler(launchpad.ArrowPressed, grid.onArrow)
-		grid.Layout.SetHandler(launchpad.ArrowHold, grid.onArrow)
-		grid.Layout.SetHoldTimer(launchpad.ArrowHold, time.Millisecond*75)
+		grid.Layout.SetHandler(layout.ArrowPressed, grid.onArrow)
+		grid.Layout.SetHandler(layout.ArrowHold, grid.onArrow)
+		grid.Layout.SetHoldTimer(layout.ArrowHold, time.Millisecond*75)
 	}
 
-	grid.Layout.SetHandler(launchpad.PadPressed, func(layout *launchpad.BasicLayout, btn button.Button) {
+	grid.Layout.SetHandler(layout.PadPressed, func(layout layout.Layout, btn button.Button) {
 		grid.onPad(btn, Pressed)
 	})
-	grid.Layout.SetHandler(launchpad.PadReleased, func(layout *launchpad.BasicLayout, btn button.Button) {
+	grid.Layout.SetHandler(layout.PadReleased, func(layout layout.Layout, btn button.Button) {
 		grid.onPad(btn, Released)
 	})
 
@@ -135,7 +136,7 @@ func (g *Grid) CanPanRight() bool {
 	return g.wrap || g.posX < g.sizeX-8
 }
 
-func (g *Grid) onArrow(layout *launchpad.BasicLayout, btn button.Button) {
+func (g *Grid) onArrow(layout layout.Layout, btn button.Button) {
 	switch btn {
 	case button.Up:
 		g.PanUp()
@@ -193,7 +194,7 @@ func (g *Grid) updateColors() {
 				if canMove() {
 					mapp[btn] = seven_bits.FromColor(color.White)
 				} else {
-					mapp[btn] = seven_bits.FromColor(color.RGBA{R: 255})
+					mapp[btn] = seven_bits.FromColor(color.Red)
 				}
 			}
 		}
