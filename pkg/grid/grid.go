@@ -19,7 +19,7 @@ import (
 	the speed which those arrow scroll the colors
 */
 type Grid struct {
-	Layout       *layout.BasicLayout
+	layout.Layout
 	posX, posY   int
 	sizeX, sizeY int
 	colors       [][]color.Color
@@ -69,7 +69,7 @@ func NewGrid(x, y int, arrows bool, mask launchpad.Mask) *Grid {
 	})
 
 	grid.Layout.SetColorMany(button.Arrows(), color.White)
-	grid.updateColors()
+	grid.UpdateDevice()
 
 	return &grid
 }
@@ -148,7 +148,7 @@ func (g *Grid) onArrow(layout layout.Layout, btn button.Button) {
 		g.PanRight()
 	}
 
-	g.updateColors()
+	g.UpdateDevice()
 }
 
 func (g *Grid) Color(x, y int) color.Color {
@@ -171,10 +171,9 @@ func (g *Grid) SetColor(x, y int, col color.Color) {
 		return
 	}
 	g.colors[x][y] = col
-	g.updateColors()
 }
 
-func (g *Grid) updateColors() {
+func (g *Grid) UpdateDevice() {
 	mapp := button.ColorMap{}
 
 	if g.arrows {
@@ -234,7 +233,7 @@ func (g *Grid) Wrap(b bool) {
 		g.posY = clamp(g.posY, 0, g.sizeY-8)
 	}
 
-	g.updateColors()
+	g.UpdateDevice()
 }
 
 func (g *Grid) wrapPos(x, y int) (int, int) {

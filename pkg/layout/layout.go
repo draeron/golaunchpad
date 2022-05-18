@@ -17,10 +17,24 @@ type Layout interface {
 	Disconnect()
 	Activate()
 	Deactivate()
+
+	SetHandler(htype HandlerType, handler Handler)
+	SetHandlerHold(htype HandlerType, handler HoldHandler)
+	SetHoldTimer(htype HandlerType, duration time.Duration)
+	SetDefaultHoldTimer(duration time.Duration)
+
+	HoldTime(btn button.Button) time.Duration
+	IsPressed(btn button.Button) bool
+	IsHold(btn button.Button, threshold time.Duration) bool
+
+	launchpad.Colorer
+
+	SetName(s string)
+	Name() string
 }
 
 type BasicLayout struct {
-	DebugName  string
+	name       string
 	state      launchpad.ButtonStateMap
 	lastColors button.ColorMap
 	controler  launchpad.Controller
@@ -61,8 +75,8 @@ func (l *BasicLayout) Connect(controller launchpad.Controller) {
 	l.controler = controller
 	l.mutex.Unlock()
 
-	if l.DebugName != "" {
-		log.Infof("connecting layout %s to controller %s", l.DebugName, controller.Name())
+	if l.name != "" {
+		log.Infof("connecting layout %s to controller %s", l.name, controller.Name())
 	}
 
 	go l.tickEvents()
@@ -73,8 +87,8 @@ func (l *BasicLayout) Disconnect() {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
-	if l.DebugName != "" {
-		log.Infof("disconnecting layout %s from controller %s", l.DebugName, l.controler.Name())
+	if l.name != "" {
+		log.Infof("disconnecting layout %s from controller %s", l.name, l.controler.Name())
 	}
 
 	close(l.eventsCh)
@@ -290,4 +304,12 @@ func (l *BasicLayout) dispatch(e event.Event) {
 		l.state.Release(e.Btn)
 	}
 	l.mutex.Unlock()
+}
+
+func (l *BasicLayout) SetName(s string) {
+	l.name = s
+}
+
+func (l *BasicLayout) Name() string {
+	return l.name
 }

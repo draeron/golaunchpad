@@ -31,7 +31,7 @@ func setup() {
 		button.User: true,
 	}
 	gryd := grid.NewGrid(16, 16, true, mask)
-	gryd.Layout.DebugName = "grid"
+	gryd.Layout.SetName("grid")
 
 	gryd.Layout.SetHoldTimer(layout.ArrowHold, time.Millisecond*20)
 	gryd.SetHandler(func(grd *grid.Grid, x, y int, event grid.EventType) {
@@ -49,7 +49,7 @@ func setup() {
 	// Add a toggle on the user btn
 	wrapped := false
 	gryd.Layout.SetColor(button.User, color.Yellow)
-	gryd.Layout.SetHandler(layout.ModePressed, func(layout *layout.BasicLayout, btn button.Button) {
+	gryd.Layout.SetHandler(layout.ModePressed, func(layout layout.Layout, btn button.Button) {
 		if btn == button.User {
 			wrapped = !wrapped
 			gryd.Wrap(wrapped)
@@ -58,6 +58,7 @@ func setup() {
 			} else {
 				gryd.Layout.SetColor(btn, color.Yellow)
 			}
+			gryd.UpdateDevice()
 		}
 	})
 

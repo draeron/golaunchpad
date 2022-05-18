@@ -105,6 +105,9 @@ func (m *Controller) Name() string {
 	return "MidiDevice"
 }
 
+func (m *Controller) SetName(name string) {
+}
+
 func (m *Controller) SetBrightness(level byte) error {
 	msg := cmd.BrightnessLevel.SysEx(level)
 	return m.device.SendMidi(msg)
