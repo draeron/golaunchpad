@@ -28,25 +28,25 @@ func main() {
 }
 
 func setup() {
-	layout := layout.NewLayoutPreset(launchpad.MaskAll)
-	layout.DebugName = "blend"
-	layout.Connect(ctrl)
-	layout.Activate()
+	mainLayout := layout.NewLayoutPreset(launchpad.MaskAll)
+	mainLayout.SetName("blend")
+	mainLayout.Connect(ctrl)
+	mainLayout.Activate()
 
-	common.Must(layout.SetColorAll(color.Black))
-	common.Must(layout.SetColor(button.Logo, color.LightGray))
-	common.Must(layout.SetColorMany(button.Modes(), color.LightGray))
+	common.Must(mainLayout.SetColorAll(color.Black))
+	common.Must(mainLayout.SetColor(button.Logo, color.LightGray))
+	common.Must(mainLayout.SetColorMany(button.Modes(), color.LightGray))
 
 	for i, b := range button.Rows() {
-		common.Must(layout.SetColor(b, color.PaletteColor(i)))
+		common.Must(mainLayout.SetColor(b, color.PaletteColor(i)))
 	}
 
 	const blendtime = time.Millisecond * 400
 
-	layout.SetHandler(layout.RowPressed, func(layout *layout.BasicLayout, btn button.Button) {
+	mainLayout.SetHandler(layout.RowPressed, func(layout layout.Layout, btn button.Button) {
 		col := color.PaletteColor(btn - button.Row1)
 		for _, btn := range button.Pads() {
-			old := layout.Color(btn)
+			old := mainLayout.Color(btn)
 			if color.Black.Equal(color.FromStdColor(old)) {
 				blend := dcolor.Blend(old, col, blendtime)
 				common.Must(layout.SetColor(btn, blend))
@@ -54,22 +54,18 @@ func setup() {
 		}
 	})
 
-	layout.SetHandler(layout.RowHold, func(layout *layout.BasicLayout, btn button.Button) {
+	//mainLayout.SetHandler(mainLayout.RowHold, func(layout *mainLayout.BasicLayout, btn button.Button) {
+	mainLayout.SetHandler(layout.RowHold, func(layout layout.Layout, btn button.Button) {
 		col := color.PaletteColor(btn - button.Row1)
 		for _, btn := range button.Pads() {
-			old := layout.Color(btn)
+			old := mainLayout.Color(btn)
 			blend := dcolor.Blend(old, col, time.Millisecond*100)
 			common.Must(layout.SetColor(btn, blend))
 		}
 	})
 
 	// stop blending by assigning a color to the button
-	layout.SetHandler(layout.PadPressed, func(layout *layout.BasicLayout, btn button.Button) {
+	mainLayout.SetHandler(layout.PadPressed, func(layout layout.Layout, btn button.Button) {
 		layout.SetColor(btn, color.Black)
 	})
-
-}
-
-func setPadColor() {
-
 }

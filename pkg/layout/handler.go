@@ -1,6 +1,7 @@
 package layout
 
 import (
+	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
 )
 
@@ -26,6 +27,14 @@ type HoldHandler func(layout Layout, btn button.Button, first bool)
 )
 */
 type HandlerType int
+
+func MaskedHandler(mask launchpad.Mask, handler Handler) Handler {
+	return func(layout Layout, btn button.Button) {
+		if mask[btn] {
+			handler(layout, btn)
+		}
+	}
+}
 
 func (h HandlerType) IsPressed() bool {
 	switch h {

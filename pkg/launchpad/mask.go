@@ -20,9 +20,6 @@ type MaskPreset int
 
 type Mask map[button.Button]bool
 
-/*
-	Remove
-*/
 func (m Mask) Intersect(mapp ButtonStateMap) button.ColorMap {
 	out := make(button.ColorMap)
 	for k, v := range m {

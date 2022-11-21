@@ -90,7 +90,9 @@ import (
 	Pad68
 	Pad78
 	Pad88
-) */
+
+)
+*/
 type Button int
 
 type Buttons []Button

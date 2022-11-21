@@ -22,9 +22,9 @@ func FromMidiEvent(evt event.Event) Event {
 	switch evt.Type {
 	case event.NoteOn, event.NoteOff:
 		e.Btn = button.FromMidiId(evt.Controller)
-		if evt.Type == event.NoteOn {
+		if evt.Type == event.NoteOn && evt.Value > 0 {
 			e.Type = Pressed
-		} else if evt.Type == event.NoteOff {
+		} else if evt.Type == event.NoteOff || evt.Value == 0 {
 			e.Type = Released
 		}
 	case event.ControlChange:

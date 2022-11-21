@@ -3,6 +3,8 @@ package common
 import (
 	"context"
 	"fmt"
+	"github.com/sirupsen/logrus"
+	"log"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -49,9 +51,11 @@ func RandColor() color.RGB {
 }
 
 func Setup() launchpad.Controller {
+	logrus.SetLevel(logrus.DebugLevel)
 	color.SetLogger(logger.NewLogrus("color"))
 	midi.SetLogger(logger.NewLogrus("midi"))
 	minimk3.SetLogger(logger.NewLogrus("minimk3"))
+	launchpad.SetLogger(logger.NewLogrus("launchpad"))
 
 	// StartProfiling()
 
@@ -59,7 +63,12 @@ func Setup() launchpad.Controller {
 	Must(err)
 	Must(pad.Diag())
 
-	// pad.EnableDebugLogger()
+	err = pad.SetColorAll(color.Black)
+	if err != nil {
+		log.Fatalf("could not reset colors: %+v", err)
+	}
+
+	pad.EnableDebugLogger()
 
 	return pad
 }

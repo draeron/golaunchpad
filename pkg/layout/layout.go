@@ -122,9 +122,15 @@ func (l *BasicLayout) Deactivate() {
 	The handler will be
 */
 func (l *BasicLayout) SetHandler(htype HandlerType, handler Handler) {
-	l.handlers[htype] = func(layout Layout, btn button.Button, first bool) {
-		if first {
+	if htype.IsHold() {
+		l.handlers[htype] = func(layout Layout, btn button.Button, first bool) {
 			handler(layout, btn)
+		}
+	} else {
+		l.handlers[htype] = func(layout Layout, btn button.Button, first bool) {
+			if first {
+				handler(layout, btn)
+			}
 		}
 	}
 }
@@ -226,7 +232,10 @@ func (l *BasicLayout) tickUpdate() {
 	l.mutex.Unlock()
 
 	for range l.ticker.C {
-		l.UpdateDevice()
+		err := l.UpdateDevice()
+		if err != nil {
+			log.Errorf("failed to update device: %v", err)
+		}
 	}
 }
 
