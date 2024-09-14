@@ -33,3 +33,5 @@ $RECYCLE.BIN/
 *.pprof
 *.arm
 go.work*
+
+.DS_Store
