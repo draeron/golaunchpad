@@ -1,6 +1,6 @@
 package event
 
-//go:generate go-enum -f=$GOFILE --noprefix
+// go tool github.com/abice/go-enum -f=$GOFILE --noprefix
 
 // Type x ENUM(
 /*

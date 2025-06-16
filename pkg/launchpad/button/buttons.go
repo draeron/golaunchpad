@@ -5,7 +5,12 @@ import (
 	"sort"
 )
 
-//go:generate go-enum -f=$GOFILE --noprefix
+// go tool github.com/abice/go-enum -f=$GOFILE --noprefix
+
+const (
+	FirstArrow = Up
+	FirstMode  = Session
+)
 
 /*
 	Button x ENUM(
@@ -149,7 +154,7 @@ func (b Button) Coord() (x, y int) {
 		return 9, int(1 + diff)
 	case b.IsPad():
 		diff := b - Pad11
-		return int(diff % 8), int(1 + diff/8)
+		return int(diff % 8), int(diff / 8)
 	}
 
 	return 0, 9 // default to logo

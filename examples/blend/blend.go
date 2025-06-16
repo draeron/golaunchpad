@@ -28,7 +28,7 @@ func main() {
 }
 
 func setup() {
-	mainLayout := layout.NewLayoutPreset(launchpad.MaskAll)
+	mainLayout := layout.NewLayoutPreset(mask.ButtonsAll)
 	mainLayout.SetName("blend")
 	mainLayout.Connect(ctrl)
 	mainLayout.Activate()
@@ -54,7 +54,7 @@ func setup() {
 		}
 	})
 
-	//mainLayout.SetHandler(mainLayout.RowHold, func(layout *mainLayout.BasicLayout, btn button.Button) {
+	// mainLayout.SetHandler(mainLayout.RowHold, func(layout *mainLayout.BasicLayout, btn button.Button) {
 	mainLayout.SetHandler(layout.RowHold, func(layout layout.Layout, btn button.Button) {
 		col := color.PaletteColor(btn - button.Row1)
 		for _, btn := range button.Pads() {

@@ -5,18 +5,19 @@ import (
 
 	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
+	"github.com/draeron/golaunchpad/pkg/launchpad/mask"
 	"github.com/draeron/golaunchpad/pkg/layout"
 	"github.com/draeron/gopkgs/color"
 	"github.com/draeron/gopkgs/color/7bits"
 )
 
 /*
-	A colors is a layout which is larger than the 8x8. Colors
-	are allocated through coordinate system and arrows are
-	used to scroll the window
+A colors is a layout which is larger than the 8x8. Colors
+are allocated through coordinate system and arrows are
+used to scroll the window
 
-	options exist to setup arrows button automatically and
-	the speed which those arrow scroll the colors
+options exist to setup arrows button automatically and
+the speed which those arrow scroll the colors
 */
 type Grid struct {
 	layout.Layout
@@ -36,15 +37,15 @@ const (
 type EventType int
 type Handler func(grid *Grid, x, y int, event EventType)
 
-func NewGrid(x, y int, arrows bool, mask launchpad.Mask) *Grid {
-	mask = launchpad.MaskPad.Mask().Merge(mask)
+func NewGrid(x, y int, arrows bool, msk mask.Buttons) *Grid {
+	msk = msk.MergePreset(mask.Pad)
 	if arrows {
-		mask = mask.MergePreset(launchpad.MaskArrows)
+		msk = msk.MergePreset(mask.Arrows)
 	}
 
 	grid := Grid{
 		colors: make([][]color.Color, x),
-		Layout: layout.NewLayout(mask),
+		Layout: layout.NewLayout(msk),
 		sizeX:  x,
 		sizeY:  y,
 		arrows: arrows,

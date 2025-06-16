@@ -1,15 +1,13 @@
 package common
 
 import (
-	"context"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"log"
 	"math/rand"
 	"os"
 	"os/signal"
 
-	"github.com/TheCodeTeam/goodbye"
+	"github.com/sirupsen/logrus"
 
 	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/minimk3"
@@ -21,10 +19,6 @@ import (
 func WaitExit() {
 	sigs := make(chan os.Signal, 1)
 	done := make(chan bool, 1)
-
-	ctx := context.Background()
-	goodbye.Notify(ctx)
-	// defer goodbye.Exit(ctx, -1)
 
 	signal.Notify(sigs)
 	go func() {

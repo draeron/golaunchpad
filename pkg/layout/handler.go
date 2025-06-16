@@ -1,34 +1,35 @@
 package layout
 
 import (
-	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
+	"github.com/draeron/golaunchpad/pkg/launchpad/mask"
 )
 
-//go:generate go-enum -f=$GOFILE --noprefix
+//go:generate go tool github.com/abice/go-enum -f=$GOFILE --noprefix
 
 type Handler func(layout Layout, btn button.Button)
 type HoldHandler func(layout Layout, btn button.Button, first bool)
 
 /*
-	HandlerType x ENUM(
-	RowPressed
-  RowHold
-	RowReleased
-	PadPressed
-  PadHold
-	PadReleased
-	ModePressed
-	ModeHold
-	ModeReleased
-	ArrowPressed
-	ArrowHold
-	ArrowReleased
+		HandlerType x ENUM(
+		RowPressed
+	  RowHold
+		RowReleased
+		PadPressed
+	  PadHold
+		PadReleased
+		ModePressed
+		ModeHold
+		ModeReleased
+		ArrowPressed
+		ArrowHold
+		ArrowReleased
+
 )
 */
 type HandlerType int
 
-func MaskedHandler(mask launchpad.Mask, handler Handler) Handler {
+func MaskedHandler(mask mask.Buttons, handler Handler) Handler {
 	return func(layout Layout, btn button.Button) {
 		if mask[btn] {
 			handler(layout, btn)

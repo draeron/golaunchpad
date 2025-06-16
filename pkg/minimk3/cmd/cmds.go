@@ -7,7 +7,7 @@ import (
 	"gitlab.com/gomidi/midi/v2"
 )
 
-//go:generate go-enum -f=$GOFILE --noprefix
+// go tool github.com/abice/go-enum -f=$GOFILE --noprefix
 
 // Cmd x ENUM(
 /*

@@ -1,15 +1,16 @@
 package minimk3
 
-//go:generate go-enum -f=$GOFILE
+// go tool github.com/abice/go-enum -f=$GOFILE
 
 /*
-	Layout x ENUM(
-  Session
-  Drum
-  Keys
-  User
-  DawFaders
-  Programmer
+		Layout x ENUM(
+	  Session
+	  Drum
+	  Keys
+	  User
+	  DawFaders
+	  Programmer
+
 )
 */
 type Layout int

@@ -26,7 +26,7 @@ func main() {
 }
 
 func setup() {
-	mask := launchpad.Mask{
+	mask := mask.Buttons{
 		button.User: true,
 	}
 	gryd := grid.NewGrid(16, 16, true, mask)

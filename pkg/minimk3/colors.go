@@ -1,6 +1,7 @@
 package minimk3
 
 import (
+	"github.com/draeron/golaunchpad/pkg/launchpad/mask"
 	"github.com/draeron/gopkgs/color"
 	"github.com/draeron/gopkgs/color/7bits"
 
@@ -16,6 +17,11 @@ const (
 
 func (m *Controller) SetColorAll(col color.Color) error {
 	return m.SetColorMany(button.Values(), col)
+}
+
+func (m *Controller) SetColorPad(x, y int, color color.Color) error {
+	btn := button.FromPadXY(x, y)
+	return m.SetColor(btn, color)
 }
 
 func (m *Controller) SetColorMany(btns []button.Button, col color.Color) error {
@@ -35,6 +41,14 @@ func (m *Controller) SetColor(btn button.Button, color color.Color) error {
 	return m.device.SendDaw(msg)
 }
 
+func (m *Controller) SetColorMask(mask mask.Buttons, col color.Color) error {
+	return m.SetColorMany(mask.Slice(), col)
+}
+
+func (m *Controller) SetColorMaskPreset(preset mask.Preset, col color.Color) error {
+	return m.SetColorMask(preset.Mask(), col)
+}
+
 func (m *Controller) SetColors(mapp button.ColorMap) error {
 	buf := buffer.Buffer{}
 	idx := 0
@@ -50,7 +64,8 @@ func (m *Controller) SetColors(mapp button.ColorMap) error {
 			log.Warnf("sending too many colors (%d) in a single message", len(mapp))
 			break
 		}
-		if _, err := buf.Write([]byte{RgbColorInstruction, btn.Id(), col.R, col.G, col.B}); err != nil {
+		tmp := seven_bits.FromColor(col)
+		if _, err := buf.Write([]byte{RgbColorInstruction, btn.Id(), tmp.R, tmp.G, tmp.B}); err != nil {
 			return err
 		}
 	}

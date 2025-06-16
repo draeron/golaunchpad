@@ -3,6 +3,7 @@ package launchpad
 import (
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
 	"github.com/draeron/golaunchpad/pkg/launchpad/event"
+	"github.com/draeron/golaunchpad/pkg/launchpad/mask"
 	"github.com/draeron/gopkgs/color"
 )
 
@@ -31,5 +32,8 @@ type Colorer interface {
 	SetColorAll(col color.Color) error
 	SetColorMany(btns []button.Button, color color.Color) error
 	SetColor(btn button.Button, color color.Color) error
+	SetColorMask(mask mask.Buttons, col color.Color) error
+	SetColorMaskPreset(mask mask.Preset, col color.Color) error
 	SetColors(sets button.ColorMap) error
+	SetColorPad(x, y int, color color.Color) error
 }

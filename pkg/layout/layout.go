@@ -8,7 +8,9 @@ import (
 
 	"github.com/draeron/golaunchpad/pkg/launchpad"
 	"github.com/draeron/golaunchpad/pkg/launchpad/button"
+	"github.com/draeron/golaunchpad/pkg/launchpad/button/state"
 	"github.com/draeron/golaunchpad/pkg/launchpad/event"
+	"github.com/draeron/golaunchpad/pkg/launchpad/mask"
 	"github.com/draeron/gopkgs/color"
 )
 
@@ -23,6 +25,8 @@ type Layout interface {
 	SetHoldTimer(htype HandlerType, duration time.Duration)
 	SetDefaultHoldTimer(duration time.Duration)
 
+	SetColorState(mask mask.Buttons, state ColoredState)
+
 	HoldTime(btn button.Button) time.Duration
 	IsPressed(btn button.Button) bool
 	IsHold(btn button.Button, threshold time.Duration) bool
@@ -33,17 +37,24 @@ type Layout interface {
 	Name() string
 }
 
+type ColoredState struct {
+	Pressed  color.Color
+	Released color.Color
+}
+
 type BasicLayout struct {
 	name       string
-	state      launchpad.ButtonStateMap
+	state      state.Map
 	lastColors button.ColorMap
 	controler  launchpad.Controller
 	handlers   handlersMap
 	enabled    atomic.Bool
 	eventsCh   chan (event.Event)
-	mask       launchpad.Mask
+	mask       mask.Buttons
 	mutex      sync.RWMutex
 	ticker     *time.Ticker
+
+	colorStates map[button.Button]ColoredState
 
 	holdTimer        map[HandlerType]time.Duration
 	holdTimerDefault time.Duration
@@ -53,18 +64,19 @@ type handlersMap map[HandlerType]HoldHandler
 
 const DefaultHoldDuration = time.Millisecond * 250
 
-func NewLayoutPreset(preset launchpad.MaskPreset) *BasicLayout {
+func NewLayoutPreset(preset mask.Preset) *BasicLayout {
 	return NewLayout(preset.Mask())
 }
 
-func NewLayout(mask launchpad.Mask) *BasicLayout {
+func NewLayout(mask mask.Buttons) *BasicLayout {
 	l := &BasicLayout{
-		state:            launchpad.NewButtonStateMap(),
+		state:            state.NewButtonStateMap(),
 		lastColors:       button.ColorMap{},
 		handlers:         handlersMap{},
 		mask:             mask,
 		holdTimerDefault: DefaultHoldDuration,
 		holdTimer:        map[HandlerType]time.Duration{},
+		colorStates:      map[button.Button]ColoredState{},
 	}
 	l.state.SetColors(mask, color.Black) // allocated state
 	return l
@@ -79,7 +91,7 @@ func (l *BasicLayout) Connect(controller launchpad.Controller) {
 		log.Infof("connecting layout %s to controller %s", l.name, controller.Name())
 	}
 
-	go l.tickEvents()
+	go l.Events()
 	go l.tickUpdate()
 }
 
@@ -98,14 +110,14 @@ func (l *BasicLayout) Disconnect() {
 }
 
 /*
-	When enabling a layout, it will transfert it's color state to
+When enabling a layout, it will transfert it's color state to
 */
 func (l *BasicLayout) Activate() {
 	l.enabled.Store(true)
 }
 
 /*
-	When disabling a layout, any pressed state will be deleted
+When disabling a layout, any pressed state will be deleted
 */
 func (l *BasicLayout) Deactivate() {
 	l.enabled.Store(false)
@@ -118,9 +130,6 @@ func (l *BasicLayout) Deactivate() {
 	l.state.ResetPressed()
 }
 
-/*
-	The handler will be
-*/
 func (l *BasicLayout) SetHandler(htype HandlerType, handler Handler) {
 	if htype.IsHold() {
 		l.handlers[htype] = func(layout Layout, btn button.Button, first bool) {
@@ -131,6 +140,17 @@ func (l *BasicLayout) SetHandler(htype HandlerType, handler Handler) {
 			if first {
 				handler(layout, btn)
 			}
+		}
+	}
+}
+
+func (l *BasicLayout) SetColorState(mask mask.Buttons, state ColoredState) {
+	for btn, _ := range mask {
+		l.colorStates[btn] = state
+		if l.IsPressed(btn) {
+			l.SetColor(btn, state.Pressed)
+		} else {
+			l.SetColor(btn, state.Released)
 		}
 	}
 }
@@ -168,7 +188,7 @@ func (l *BasicLayout) UpdateDevice() error {
 			return nil
 		}
 
-		colors := l.mask.Intersect(l.state).DiffFrom(l.lastColors)
+		colors := l.state.Intersect(l.mask).DiffFrom(l.lastColors)
 
 		if len(colors) > 0 {
 			err := l.controler.SetColors(colors)
@@ -191,11 +211,12 @@ func (l *BasicLayout) SetColorAll(col color.Color) error {
 	return nil
 }
 
-func (l *BasicLayout) SetColorMask(mask launchpad.MaskPreset, col color.Color) error {
-	for b, _ := range mask.Mask() {
-		l.state.SetColor(b, col)
-	}
-	return nil
+func (m *BasicLayout) SetColorMask(mask mask.Buttons, col color.Color) error {
+	return m.SetColorMany(mask.Slice(), col)
+}
+
+func (m *BasicLayout) SetColorMaskPreset(preset mask.Preset, col color.Color) error {
+	return m.SetColorMask(preset.Mask(), col)
 }
 
 func (l *BasicLayout) SetColorMany(btns []button.Button, color color.Color) error {
@@ -215,14 +236,40 @@ func (l *BasicLayout) SetColors(set button.ColorMap) error {
 	return nil
 }
 
-func (l *BasicLayout) tickEvents() {
+func (l *BasicLayout) SetColorPad(x, y int, color color.Color) error {
+	l.state.SetColor(button.FromPadXY(x, y), color)
+	return nil
+}
+
+func (l *BasicLayout) Events() {
 	l.mutex.Lock()
 	l.eventsCh = make(chan event.Event, 20)
 	l.controler.Subscribe(l.eventsCh)
 	l.mutex.Unlock()
 
 	for e := range l.eventsCh {
+		l.setAutomaticColor(e)
 		l.dispatch(e)
+	}
+}
+
+func (l *BasicLayout) setAutomaticColor(e event.Event) {
+	l.mutex.Lock()
+	st, ok := l.colorStates[e.Btn]
+	l.mutex.Unlock()
+
+	if ok {
+		var col color.Color
+		switch e.Type {
+		case event.Pressed:
+			col = st.Pressed
+		case event.Released:
+			col = st.Released
+		}
+
+		if col != nil {
+			l.SetColor(e.Btn, col)
+		}
 	}
 }
 
@@ -234,7 +281,7 @@ func (l *BasicLayout) tickUpdate() {
 	for range l.ticker.C {
 		err := l.UpdateDevice()
 		if err != nil {
-			log.Errorf("failed to update device: %v", err)
+			log.Errorf("failed to update device: %+v", err)
 		}
 	}
 }

@@ -29,7 +29,7 @@ func main() {
 }
 
 func setup() {
-	top = layout.NewLayoutPreset(launchpad.MaskTop)
+	top = layout.NewLayoutPreset(mask.ButtonsTop)
 	top.SetName("top")
 	top.SetHandler(layout.ModePressed, func(layout layout.Layout, btn button.Button) {
 		pads[currentMode].Deactivate()
@@ -43,7 +43,7 @@ func setup() {
 		id := button.Session + button.Button(i)
 		top.SetColor(id, modeColors[i])
 
-		pads[i] = layout.NewLayoutPreset(launchpad.MaskPad)
+		pads[i] = layout.NewLayoutPreset(mask.ButtonsPad)
 		pads[i].SetName(id.String())
 		pads[i].Connect(device)
 		pads[i].SetHandler(layout.PadPressed, func(layout layout.Layout, btn button.Button) {
